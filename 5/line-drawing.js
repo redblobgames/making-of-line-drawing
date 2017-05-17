@@ -25,10 +25,11 @@ function lerp(start, end, t) {
 class Diagram {
     constructor(containerId) {
         this.root = d3.select(`#${containerId}`);
+        this.t = 0.3;
         this.A = {x: 2, y: 2};
         this.B = {x: 20, y: 8};
 
-        this.makeScrubbableNumber('t', 0.3, 0.0, 1.0, 2);
+        this.makeScrubbableNumber('t', 0.0, 1.0, 2);
         this.update();
     }
 
@@ -43,10 +44,8 @@ class Diagram {
         set("#lerp4", ".1f", 5, 3);
     }
 
-    makeScrubbableNumber(name, initialValue, low, high, precision) {
+    makeScrubbableNumber(name, low, high, precision) {
         let diagram = this;
-        diagram[name] = initialValue;
-
         let elements = diagram.root.selectAll(`[data-name='${name}']`);
         let positionToValue = d3.scaleLinear()
             .clamp(true)

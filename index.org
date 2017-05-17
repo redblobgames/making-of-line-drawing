@@ -13,9 +13,19 @@ iframe {
 </style>
 #+end_export
 
-People have asked me how I write interactive tutorials like [[http://www.redblobgames.com/grids/line-drawing.html][this one]]. I can point at the final result but the final result doesn't show the /process/. On this page I'll step through how I made the line drawing tutorial. I'll include pointers to the code.
+People have asked me how I write my interactive tutorials. I can point at the final result but the final result doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]]:
+
+#+begin_export html
+<!-- 750 == 600 / 0.8 -->
+<iframe id="iframe" src="/grids/line-drawing.html" width="750" height="300"  style="transform:scale(0.8);transform-origin:left top"/>
+#+end_export
+
+It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step.
 
 * Web page
+:PROPERTIES:
+:CUSTOM_ID: web-page
+:END:
 
 I usually start with a basic web page template that includes scripts, footers, etc.
 
@@ -27,7 +37,18 @@ I usually start with a basic web page template that includes scripts, footers, e
 
 I'll omit the header and footer from the rest of the examples.
 
+** TODO Tense
+
+Do I want present tense or future tense? Imperative or declarative? Go through the text and make sure it's all consistent
+
+** TODO Links to code
+
+Link to the github folders
+
 * Diagram
+:PROPERTIES:
+:CUSTOM_ID: diagram
+:END:
 
 Sometimes I'll add a diagram first and then add some text; other times I'll start with the text and then figure out the diagrams. For this page I'll start with a diagram.
 
@@ -64,6 +85,9 @@ Hooray, it works!
 This is just the beginning. It's a working implementation of the algorithm and a working diagram. But it's not /interactive/.
 
 * Interaction
+:PROPERTIES:
+:CUSTOM_ID: interaction
+:END:
 
 What I most often do for interaction is let the reader change the inputs to the algorithm. For line drawing, the inputs are the two endpoints, =A= and =B= in the code.
 
@@ -84,6 +108,9 @@ Great! It's pretty easy with [[https://github.com/d3/d3-drag][d3-drag]]. This co
 Great! Now I have an interactive diagram. But this isn't an /explanation/.
 
 * Steps
+:PROPERTIES:
+:CUSTOM_ID: steps
+:END:
 
 To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[http://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I listed the steps in the code:
 
@@ -113,36 +140,84 @@ A pattern is starting to form, but I haven't made use of it yet. There's a =<g>=
 Each of these layers has some code to draw it and sometimes some code to update it. As I add more layers to the diagram I'll do something better with the draw and update code.
 
 * Linear interpolation of numbers
+:PROPERTIES:
+:CUSTOM_ID: lerp-numbers
+:END:
 
 In this section I don't actually have a diagram, but I do have some interaction, so I'm going to use a diagram object anyway without an svg. I want to drag a number left and right to change it, and see how it affects some calculations. Take a look at Bret Victor's [[http://worrydream.com/Tangle/][Tangle library]] for inspiration. You might want to use his library directly. For this page I used [[https://github.com/d3/d3-drag][d3-drag]] instead.
 
-How do I want this to work?
+How did I want this to work?
 
-- I want to be able to drag a number left/right.
+- I want to be able to “scrub” (drag) a number left/right.
 - I want to choose the formatting (e.g. =1.00= vs =1.0= vs =1=).
 - I want to be able to run the update function when the number changes.
 
-There are other things that you may want for draggable numbers but these are all I needed for this tutorial. I decided that within a named ~<div>~ section I'd find all the ~<span data-name="XYZ">~ and turn them into draggable numbers stored in field XYZ. I ended up only having two names, =t= and =N=, but I didn't realize this until later.
+There are other things that you may want for scrubbable numbers but these are all I needed for this tutorial. I decided that within a named ~<div>~ section I'd find all the ~<span data-name="XYZ">~ and turn them into scrubable numbers stored in field XYZ. I ended up only having two names, =t= and =N=, but I didn't realize this until later.
 
 #+begin_export html
 <iframe src="5/" width="600" height="150"/>
 #+end_export
 
-Draggable numbers are cool but a little bit tricky. I'm using d3-drag tell me how far left/right the mouse was dragged. Then I scale the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
+Scrubbable numbers are cool but a little bit tricky. I used d3-drag to tell me how far left/right the mouse was dragged. Then I scaled the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
 
 #+include: "5/line-drawing.js" src js :lines "21-"
 
-When the number is dragged, I update the display of the number, and I also call the diagram's =update= function to update any other aspect of the diagram.
+When the number is dragged, I updated the display of the number, and I also called the diagram's =update= function to update any other aspect of the diagram.
 
 * Linear interpolation of points
+:PROPERTIES:
+:CUSTOM_ID: lerp-points
+:END:
 
-{ diagram }
+Using linear interpolation of numbers, I wanted to display the linear interpolation of points. I wanted two diagrams:
 
-There are now two diagrams on the page. Both display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. I'll make the diagram object have optional layers.
+- Modify /t/, the interpolation value, and see the point move.
+- Modify /N/, the number of interpolated points, and see all of the generated points.
 
-{ code }
+** Modify t
+
+Until now I had the final algorithm written in =pointsOnLine=. To split up the diagrams I also need to split the line drawing algorithm into separate steps.
+
+#+include: "6-t/line-drawing.js" src js :lines "8-16"
+
+#+begin_export html
+<iframe src="6-t/" width="600" height="300"/>
+#+end_export
+
+I'm starting to organize things in terms of layers:
+
+#+include: "6-t/line-drawing.js" src js :lines "38-65"
+
+Note that this diagram does /not/ show the line drawn on a grid. That's another reason I want to use diagram layers for this page.
+
+** Modify N
+
+Until now I had the line drawing algorithm choose N. I need to separate that out too.
+
+#+include: "6-N/line-drawing.js" src js :lines "17-26"
+
+#+begin_export html
+<iframe src="6-N/" width="600" height="300"/>
+#+end_export
+
+The drawing code turns out to be very similar to the previous case so I made it read either /t/ or /N/:
+
+#+include: "6-N/line-drawing.js" src js :lines "64-81"
+
+I also had to extend my scrubbable number implementation. Previously, I wanted floating point values but here I want it to round to an integer. I decided the easiest way to do this was to =parseFloat= the formatted output; that way it'd work no matter how many digits I'm rounding to. See the =formatter= in =makeScrubbableNumber()=.
+
+** Layers
+
+There are now three diagrams on the page. All three display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. The third diagram shows a non-grid line and also multiple interpolation points.
+
+This is a good time to set up a layer system. When I /add/ a layer, I also need to remember its /update/ function, if it has one. Each time I add a layer by calling =addXYZ()= that function will add its own update function to the diagram object.
+
+#+include: "6-layers/line-drawing.js" src js :lines "28-59"
 
 * Number of steps in the line
+:PROPERTIES:
+:CUSTOM_ID: number-of-steps
+:END:
 
 The third diagram has yet a different visualization layer.
 
@@ -153,10 +228,60 @@ I also want to place labels.
 { diagram }
 
 * Rounding
+:PROPERTIES:
+:CUSTOM_ID: rounding
+:END:
 
 We already know how to round numbers to the nearest integer. To snap points to the grid we can round both the =x= and =y= values.
 
 { diagram }
 
 * Extras
+:PROPERTIES:
+:CUSTOM_ID: extras
+:END:
+
+** Visuals
+:PROPERTIES:
+:CUSTOM_ID: extras-visuals
+:END:
+
+- grid fill vs outline
+- drag handles 
+  - squares vs circles - squares work for grid alone but circles seem better for non-grid line
+  - size - larger
+  - color - bolder
+  - outline around circles
+- border around drawn line
+- checkbox when N is right
+
+** Mouse pointer
+:PROPERTIES:
+:CUSTOM_ID: extras-mouse-pointer
+:END:
+
+- for circles
+- for numbers
+
+** Hit area
+:PROPERTIES:
+:CUSTOM_ID: extras-hit-area
+:END:
+
+- for circles
+- for numbers
+  - consistent size
+
+** Drop shadow
+:PROPERTIES:
+:CUSTOM_ID: extras-drop-shadow
+:END:
+
+- for circles
+- for numbers
+
+* Putting it all together
+:PROPERTIES:
+:CUSTOM_ID: final
+:END:
 
