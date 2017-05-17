@@ -1,0 +1,162 @@
+#+TITLE: Making of: Line drawing on a grid
+#+DATE: <2017-05-15>
+
+#+begin_export html
+<style>
+iframe { 
+    border-radius: 5px; 
+    border: 1px solid hsl(0,10%,80%); 
+    padding: 10px 23px; 
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2); 
+    background-color: hsl(60,10%,95%); 
+}
+</style>
+#+end_export
+
+People have asked me how I write interactive tutorials like [[http://www.redblobgames.com/grids/line-drawing.html][this one]]. I can point at the final result but the final result doesn't show the /process/. On this page I'll step through how I made the line drawing tutorial. I'll include pointers to the code.
+
+* Web page
+
+I usually start with a basic web page template that includes scripts, footers, etc.
+
+#+begin_export html
+<iframe src="1/" width="600" height="200"/>
+#+end_export
+
+#+include: "1/index.html" src html
+
+I'll omit the header and footer from the rest of the examples.
+
+* Diagram
+
+Sometimes I'll add a diagram first and then add some text; other times I'll start with the text and then figure out the diagrams. For this page I'll start with a diagram.
+
+The tutorial is about drawing lines on a square grid, so I need to draw a grid and also draw lines. However, that's not where I start. As much as possible, I want to get /something/ working as soon as possible, so I'll start with a blank diagram and an empty javascript file:
+
+#+begin_export html
+<iframe src="2-blank/" width="600" height="250"/>
+#+end_export
+
+#+include: "2-blank/index.html" src html
+
+I attach an ~id=~ to an html element so that I can get to it from Javascript, using ~document.getElementById~. Sometimes I'll attach it to the ~<svg>~ and sometimes to a ~<div>~ outside the svg.
+
+I'll draw a grid with Javascript, using the [[https://d3js.org/][d3.js library]]:
+
+#+begin_export html
+<iframe src="2-grid/" width="600" height="250"/>
+#+end_export
+
+#+include: "2-grid/line-drawing.js" src js :lines "4-"
+
+There's some tweaking on grid sizes. I could parameterize it and calculate it properly but often times I will hard-code it when I'm just starting out, and only calculate it if I need to. Here my svg is 550px wide and I picked squares that are 22px, so 25 of them fit across. Vertically I can fit 10 squares in 220px so I changed the svg height from 200 to 220 to fit.
+
+The next thing I need is the code to calculate the points on the line, and code to draw those points.
+
+#+begin_export html
+<iframe src="2-line/" width="600" height="250"/>
+#+end_export
+
+#+include: "2-line/line-drawing.js" src js :lines "18-"
+
+Hooray, it works!
+
+This is just the beginning. It's a working implementation of the algorithm and a working diagram. But it's not /interactive/.
+
+* Interaction
+
+What I most often do for interaction is let the reader change the inputs to the algorithm. For line drawing, the inputs are the two endpoints, =A= and =B= in the code.
+
+#+begin_export html
+<iframe src="3-draggable/" width="600" height="250"/>
+#+end_export
+
+#+include: "3-draggable/line-drawing.js" src js :lines "31-"
+
+Great! It's pretty easy with [[https://github.com/d3/d3-drag][d3-drag]]. This code lets me update =A= and =B= but it doesn't recalculate the line. To be able to redraw the line, I need to move the drawing code into a function that I can call again, and I also need to reuse the =<rect>= elements I've previously created. It's useful to use the [[https://github.com/d3/d3-selection][d3-selection]] pattern here; it will let me reuse, create, or remove elements as my data changes. To use it, I need a container for the =<rect>= elements; I put it in a variable ~gPoints~. I also need to separate the logic for the /algorithm/ (function ~pointsOnLine~) from the logic for /drawing/ (function ~redraw~).
+
+#+begin_export html
+<iframe src="3-redraw/" width="600" height="250"/>
+#+end_export
+
+#+include: "3-redraw/line-drawing.js" src js :lines "18-"
+
+Great! Now I have an interactive diagram. But this isn't an /explanation/.
+
+* Steps
+
+To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[http://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I listed the steps in the code:
+
+- Linear interpolation (lerp)
+  - of numbers
+  - of points
+- Number of steps in the line
+  - diagonal distance
+- Rounding
+  - of numbers
+  - of points
+
+Since I'm going to have multiple diagrams, it'll be useful to encapsulate all those global variables and functions into a diagram object.
+
+#+begin_export html
+<iframe src="4/" width="600" height="250"/>
+#+end_export
+
+#+include: "4/line-drawing.js" src js :lines "21-"
+
+A pattern is starting to form, but I haven't made use of it yet. There's a =<g>= for each visual layer:
+
+- the grid
+- the line
+- the draggable handles
+
+Each of these layers has some code to draw it and sometimes some code to update it. As I add more layers to the diagram I'll do something better with the draw and update code.
+
+* Linear interpolation of numbers
+
+In this section I don't actually have a diagram, but I do have some interaction, so I'm going to use a diagram object anyway without an svg. I want to drag a number left and right to change it, and see how it affects some calculations. Take a look at Bret Victor's [[http://worrydream.com/Tangle/][Tangle library]] for inspiration. You might want to use his library directly. For this page I used [[https://github.com/d3/d3-drag][d3-drag]] instead.
+
+How do I want this to work?
+
+- I want to be able to drag a number left/right.
+- I want to choose the formatting (e.g. =1.00= vs =1.0= vs =1=).
+- I want to be able to run the update function when the number changes.
+
+There are other things that you may want for draggable numbers but these are all I needed for this tutorial. I decided that within a named ~<div>~ section I'd find all the ~<span data-name="XYZ">~ and turn them into draggable numbers stored in field XYZ. I ended up only having two names, =t= and =N=, but I didn't realize this until later.
+
+#+begin_export html
+<iframe src="5/" width="600" height="150"/>
+#+end_export
+
+Draggable numbers are cool but a little bit tricky. I'm using d3-drag tell me how far left/right the mouse was dragged. Then I scale the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
+
+#+include: "5/line-drawing.js" src js :lines "21-"
+
+When the number is dragged, I update the display of the number, and I also call the diagram's =update= function to update any other aspect of the diagram.
+
+* Linear interpolation of points
+
+{ diagram }
+
+There are now two diagrams on the page. Both display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. I'll make the diagram object have optional layers.
+
+{ code }
+
+* Number of steps in the line
+
+The third diagram has yet a different visualization layer.
+
+{ diagram }
+
+I also want to place labels.
+
+{ diagram }
+
+* Rounding
+
+We already know how to round numbers to the nearest integer. To snap points to the grid we can round both the =x= and =y= values.
+
+{ diagram }
+
+* Extras
+
