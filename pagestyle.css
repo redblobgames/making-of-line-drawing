@@ -19,6 +19,27 @@ header, footer {
 
 /* the draggable elements all have data-name= ; I want them to stand out */
 span[data-name] {
+    cursor: col-resize;
     font-weight: bold;
     border-bottom: 2px dotted #a44;
 }
+circle.draggable {
+    cursor: move;
+}
+
+/* for the exploding layer diagrams */
+.layer {
+    transition: transform 2s;
+    transform: none;
+}
+.layer .glass {
+    transition: opacity 2s;
+    opacity: 0.0;
+}
+.rotated .layer .glass {
+    opacity: 1.0;
+}
+.rotated .layer-0 { transform: translateY(190px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }
+.rotated .layer-1 { transform: translateY(170px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }
+.rotated .layer-2 { transform: translateY(150px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }
+.rotated .layer-3 { transform: translateY(130px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }

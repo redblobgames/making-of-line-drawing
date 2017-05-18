@@ -3,12 +3,15 @@
 
 #+begin_export html
 <style>
-iframe { 
+iframe:not(.frameless) { 
     border-radius: 5px; 
     border: 1px solid hsl(0,10%,80%); 
     padding: 10px 23px; 
     box-shadow: inset 0 0 5px rgba(0,0,0,0.2); 
     background-color: hsl(60,10%,95%); 
+}
+iframe.frameless {
+    border: none;
 }
 </style>
 #+end_export
@@ -17,7 +20,7 @@ People have asked me how I write my interactive tutorials. I can point at the fi
 
 #+begin_export html
 <!-- 750 == 600 / 0.8 -->
-<iframe id="iframe" src="/grids/line-drawing.html" width="750" height="300"  style="transform:scale(0.8);transform-origin:left top"/>
+<iframe id="iframe" src="/grids/line-drawing.html#interpolation" width="750" height="300"  style="transform:scale(0.8);transform-origin:left top"/>
 #+end_export
 
 It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step.
@@ -97,7 +100,9 @@ What I most often do for interaction is let the reader change the inputs to the 
 
 #+include: "3-draggable/line-drawing.js" src js :lines "31-"
 
-Great! It's pretty easy with [[https://github.com/d3/d3-drag][d3-drag]]. This code lets me update =A= and =B= but it doesn't recalculate the line. To be able to redraw the line, I need to move the drawing code into a function that I can call again, and I also need to reuse the =<rect>= elements I've previously created. It's useful to use the [[https://github.com/d3/d3-selection][d3-selection]] pattern here; it will let me reuse, create, or remove elements as my data changes. To use it, I need a container for the =<rect>= elements; I put it in a variable ~gPoints~. I also need to separate the logic for the /algorithm/ (function ~pointsOnLine~) from the logic for /drawing/ (function ~redraw~).
+Great! It's pretty easy with [[https://github.com/d3/d3-drag][d3-drag]]. To help the reader know which elements are interactive, I set the CSS =cursor:move= over the draggable circles. 
+
+This code lets me update =A= and =B= but it doesn't recalculate the line. To be able to update the line, I need to move the drawing code into a function that I can call again, and I also need to reuse the =<rect>= elements I've previously created. It's useful to use the [[https://github.com/d3/d3-selection][d3-selection]] pattern here; it will let me reuse, create, or remove elements as my data changes. To use it, I need a container for the =<rect>= elements; I put it in a variable ~gPoints~. I also need to separate the logic for the /algorithm/ (function ~pointsOnLine~) from the logic for /drawing/ (function ~redraw~).
 
 #+begin_export html
 <iframe src="3-redraw/" width="600" height="250"/>
@@ -162,70 +167,75 @@ Scrubbable numbers are cool but a little bit tricky. I used d3-drag to tell me h
 
 #+include: "5/line-drawing.js" src js :lines "21-"
 
-When the number is dragged, I updated the display of the number, and I also called the diagram's =update= function to update any other aspect of the diagram.
+When the number is dragged, I updated the display of the number, and I also called the diagram's =update= function to update any other aspect of the diagram. I also set the CSS to =cursor:col-resize= so that the reader can see it's interactive.
 
 * Linear interpolation of points
 :PROPERTIES:
 :CUSTOM_ID: lerp-points
 :END:
 
-Using linear interpolation of numbers, I wanted to display the linear interpolation of points. I wanted two diagrams:
-
-- Modify /t/, the interpolation value, and see the point move.
-- Modify /N/, the number of interpolated points, and see all of the generated points.
-
-** Modify t
-
+Using linear interpolation of numbers, I wanted to display the linear interpolation of points. I wanted a diagram that lets you modify 0 ≤ t ≤ 1, and shows the resulting point.
 Until now I had the final algorithm written in =pointsOnLine=. To split up the diagrams I also need to split the line drawing algorithm into separate steps.
 
-#+include: "6-t/line-drawing.js" src js :lines "8-16"
+#+include: "6/line-drawing.js" src js :lines "8-16"
 
 #+begin_export html
-<iframe src="6-t/" width="600" height="300"/>
+<iframe src="6/" width="600" height="300"/>
 #+end_export
 
 I'm starting to organize things in terms of layers:
 
-#+include: "6-t/line-drawing.js" src js :lines "38-65"
+#+include: "6/line-drawing.js" src js :lines "38-65"
 
 Note that this diagram does /not/ show the line drawn on a grid. That's another reason I want to use diagram layers for this page.
 
-** Modify N
+* Layers
+:PROPERTIES:
+:CUSTOM_ID: layers
+:END:
 
-Until now I had the line drawing algorithm choose N. I need to separate that out too.
-
-#+include: "6-N/line-drawing.js" src js :lines "17-26"
+There are now two diagrams on the page. Both display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. There will be more diagrams soon. When I'm writing a tutorial that requires multiple diagrams, each with different features, I like to divide the diagrams into /layers/, and then stack them on top of each other. There are four layers in the previous diagram: /grid/, /track/, /interpolation point/, and /drag handle/:
 
 #+begin_export html
-<iframe src="6-N/" width="600" height="300"/>
+<iframe class="frameless" src="7/" width="600" height="300"/>
 #+end_export
 
-The drawing code turns out to be very similar to the previous case so I made it read either /t/ or /N/:
+Each layer will be created by a method that adds a =<g>= for a layer, and also adds its /update/ function to the diagram object. Here's the code for managing the update functions:
 
-#+include: "6-N/line-drawing.js" src js :lines "64-81"
+#+include: "7/line-drawing.js" src js :lines "19-35"
 
-I also had to extend my scrubbable number implementation. Previously, I wanted floating point values but here I want it to round to an integer. I decided the easiest way to do this was to =parseFloat= the formatted output; that way it'd work no matter how many digits I'm rounding to. See the =formatter= in =makeScrubbableNumber()=.
+I no longer need to put the =<g>= elements into fields in the diagram object (e.g. =gGrid=, =gHandles=, etc.); they can remain local variables in the =add= functions. Look at =addTrack()= now:
 
-** Layers
+#+include: "7/line-drawing.js" src js :lines "51-66"
 
-There are now three diagrams on the page. All three display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. The third diagram shows a non-grid line and also multiple interpolation points.
+I can now assemble a diagram by calling the =addXYZ()= functions:
 
-This is a good time to set up a layer system. When I /add/ a layer, I also need to remember its /update/ function, if it has one. Each time I add a layer by calling =addXYZ()= that function will add its own update function to the diagram object.
-
-#+include: "6-layers/line-drawing.js" src js :lines "28-59"
+#+include: "7/line-drawing.js" src js :lines "140-"
 
 * Number of steps in the line
 :PROPERTIES:
 :CUSTOM_ID: number-of-steps
 :END:
 
-The third diagram has yet a different visualization layer.
+The third diagram has yet a different visualization layer, but it will be easier to implement now that I have layers. Until now I had the line drawing algorithm choose N. I need to separate that out too.
 
-{ diagram }
+#+include: "8/line-drawing.js" src js :lines "17-26"
 
-I also want to place labels.
+#+begin_export html
+<iframe src="8/" width="600" height="300"/>
+#+end_export
 
-{ diagram }
+The drawing code turns out to be very similar to the previous case so I made it read either /t/ or /N/:
+
+#+include: "8/line-drawing.js" src js :lines "76-97"
+
+I also had to extend my scrubbable number implementation. Previously, I wanted floating point values but here I want it to round to an integer. I decided the easiest way to do this was to =parseFloat= the formatted output; that way it'd work no matter how many digits I'm rounding to. See the =formatter= in =makeScrubbableNumber()=.
+
+I also added another layer for labels:
+
+#+include: "8/line-drawing.js" src js :lines "98-119"
+
+The labels are overlapping the drag handles. I'll make the drag handles smaller later, when I'm polishing colors, fonts, spacing, etc.
 
 * Rounding
 :PROPERTIES:
@@ -234,12 +244,27 @@ I also want to place labels.
 
 We already know how to round numbers to the nearest integer. To snap points to the grid we can round both the =x= and =y= values.
 
-{ diagram }
+#+include: "9/line-drawing.js" src js :lines "26-28"
+
+I drew this on another layer.
+
+#+begin_export html
+<iframe src="9/" width="600" height="300"/>
+#+end_export
+
+This diagram has all the essential components but it could look nicer.
 
 * Extras
 :PROPERTIES:
 :CUSTOM_ID: extras
 :END:
+
+** Zero length lines
+:PROPERTIES:
+:CUSTOM_ID: zero-length-lines
+:END:
+
+The code I originally presented fails when the line distance is zero, e.g. when the start and end points are the same. I had to special case ~N == 0~ in =interpolationPoints=.
 
 ** Visuals
 :PROPERTIES:
@@ -271,6 +296,7 @@ We already know how to round numbers to the nearest integer. To snap points to t
 - for circles
 - for numbers
   - consistent size
+  - user-select css
 
 ** Drop shadow
 :PROPERTIES:
@@ -279,6 +305,13 @@ We already know how to round numbers to the nearest integer. To snap points to t
 
 - for circles
 - for numbers
+
+** SVG transforms
+:PROPERTIES:
+:CUSTOM_ID: svg-transforms
+:END:
+
+You may have noticed that there are a /lot/ of places I multiply by =scale= and add =0.5=. A lot of this would've been simpler if I had picked a different coordinate system. Instead of pixels, I could have chosen a coordinate system where grid x=1.0 would map to (1.0+1.5)*scale = 33. SVG offers two ways to do this, either with =viewBox= or with =transform=. In the original article I used =transform=.
 
 * Putting it all together
 :PROPERTIES:

@@ -11,7 +11,7 @@ for (let x = 0; x < 25; x++) {
             .attr('transform', `translate(${x*scale}, ${y*scale})`)
             .attr('width', scale)
             .attr('height', scale)
-            .attr('fill', "none")
+            .attr('fill', "white")
             .attr('stroke', "gray");
     }
 }
@@ -45,6 +45,7 @@ function redraw() {
 
 function makeDraggableCircle(point) {
     let circle = parent.append('circle')
+        .attr('class', "draggable")
         .attr('r', scale*0.75)
         .attr('fill', "hsl(0,50%,50%)")
         .call(d3.drag().on('drag', onDrag));

@@ -11,7 +11,7 @@ for (let x = 0; x < 25; x++) {
             .attr('transform', `translate(${x*scale}, ${y*scale})`)
             .attr('width', scale)
             .attr('height', scale)
-            .attr('fill', "none")
+            .attr('fill', "white")
             .attr('stroke', "gray");
     }
 }

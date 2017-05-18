@@ -14,21 +14,10 @@ function lerpPoint(P, Q, t) {
             y: lerp(P.y, Q.y, t)};
 }
 
-function interpolationPoints(P, Q, N) {
-    let points = [];
-    for (let i = 0; i <= N; i++) {
-        let t = i / N;
-        points.push(lerpPoint(P, Q, t));
-    }
-    return points;
-}
-
-
 class Diagram {
     constructor(containerId) {
         this.root = d3.select(`#${containerId}`);
-        this.t = null;
-        this.N = 5;
+        this.t = 0.3;
         this.A = {x: 2, y: 2};
         this.B = {x: 20, y: 8};
         this.parent = this.root.select("svg");
@@ -37,7 +26,7 @@ class Diagram {
         this.addTrack();
         this.addInterpolated();
         this.addHandles();
-        this.makeScrubbableNumber('N', 1, 30, 0);
+        this.makeScrubbableNumber('t', 0.0, 1.0, 2);
         this.update();
     }
 
@@ -62,21 +51,16 @@ class Diagram {
     }
 
     addInterpolated() {
-        this.gInterpolated = this.parent.append('g');
-    }
-    
-    updateInterpolated() {
-        let points = this.t != null? [lerpPoint(this.A, this.B, this.t)]
-            : this.N != null? interpolationPoints(this.A, this.B, this.N)
-            : [];
-        let circles = this.gInterpolated.selectAll("circle").data(points);
-        circles.exit().remove();
-        circles.enter().append('circle')
+        this.gInterpolated = this.parent.append('circle')
             .attr('fill', "hsl(0,30%,50%)")
-            .attr('r', 5)
-            .merge(circles)
-            .attr('transform',
-                  (p) => `translate(${(p.x+0.5)*scale}, ${(p.y+0.5)*scale})`);
+            .attr('r', 5);
+    }
+        
+    updateInterpolated() {
+        let interpolated = lerpPoint(this.A, this.B, this.t);
+        this.gInterpolated
+            .attr('cx', (interpolated.x + 0.5) * scale)
+            .attr('cy', (interpolated.y + 0.5) * scale);
     }
     
     addGrid() {
@@ -87,7 +71,7 @@ class Diagram {
                     .attr('transform', `translate(${x*scale}, ${y*scale})`)
                     .attr('width', scale)
                     .attr('height', scale)
-                    .attr('fill', "none")
+                    .attr('fill', "hsl(0,0%,100%)")
                     .attr('stroke', "gray");
             }
         }
@@ -102,6 +86,7 @@ class Diagram {
     makeDraggableCircle(P) {
         let diagram = this;
         let circle = this.gHandles.append('circle')
+            .attr('class', "draggable")
             .attr('r', scale*0.75)
             .attr('fill', "hsl(0,50%,50%)")
             .call(d3.drag().on('drag', onDrag));
@@ -128,10 +113,12 @@ class Diagram {
             .clamp(true)
             .domain([-100, +100])
             .range([low, high]);
-        let formatter = d3.format(`.${precision}f`);
 
         function updateNumbers() {
-            elements.text(formatter(diagram[name]));
+            elements.text(() => {
+                let format = `.${precision}f`;
+                return d3.format(format)(diagram[name]);
+            });
         }
 
         updateNumbers();
@@ -139,7 +126,7 @@ class Diagram {
         elements.call(d3.drag()
                       .subject({x: positionToValue.invert(diagram[name]), y: 0})
                       .on('drag', () => {
-                          diagram[name] = parseFloat(formatter(positionToValue(d3.event.x)));
+                          diagram[name] = positionToValue(d3.event.x);
                           updateNumbers();
                           diagram.update();
                       }));
@@ -147,4 +134,4 @@ class Diagram {
 }
 
 
-let diagram = new Diagram('interpolate-N');
+let diagram = new Diagram('interpolate-t');

@@ -52,7 +52,7 @@ class Diagram {
                     .attr('transform', `translate(${x*scale}, ${y*scale})`)
                     .attr('width', scale)
                     .attr('height', scale)
-                    .attr('fill', "none")
+                    .attr('fill', "white")
                     .attr('stroke', "gray");
             }
         }
@@ -61,6 +61,7 @@ class Diagram {
     makeDraggableCircle(P) {
         let diagram = this;
         let circle = this.gHandles.append('circle')
+            .attr('class', "draggable")
             .attr('r', scale*0.75)
             .attr('fill', "hsl(0,50%,50%)")
             .call(d3.drag().on('drag', onDrag));
