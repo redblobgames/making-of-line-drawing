@@ -28,6 +28,10 @@ circle.draggable {
 }
 
 /* for the exploding layer diagrams */
+button {
+    font-weight: bold;
+    margin-right: 1em;
+}
 .layer {
     transition: transform 2s;
     transform: none;
@@ -35,6 +39,13 @@ circle.draggable {
 .layer .glass {
     transition: opacity 2s;
     opacity: 0.0;
+    fill: hsl(120,10%,90%);
+    fill-opacity: 0.3;
+    stroke: hsl(120,50%,10%);
+    stroke-opacity: 0.7;
+    stroke-width: 2px;
+    width: 550px;
+    height: 220px;
 }
 .rotated .layer .glass {
     opacity: 1.0;
