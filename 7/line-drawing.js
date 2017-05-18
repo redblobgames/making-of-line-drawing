@@ -138,7 +138,7 @@ class Diagram {
 }
 
 
-let diagram_t = new Diagram('explode-me')
+let diagram_t = new Diagram('layers')
     .addGrid()
     .addTrack()
     .addInterpolated(0.5)

@@ -16,6 +16,9 @@ header, footer {
     background-color: hsl(60,20%,80%);
     padding: 0.5em;
 }
+svg {
+    overflow: visible;
+}
 
 /* the draggable elements all have data-name= ; I want them to stand out */
 span[data-name] {
@@ -23,34 +26,6 @@ span[data-name] {
     font-weight: bold;
     border-bottom: 2px dotted #a44;
 }
-circle.draggable {
+.draggable {
     cursor: move;
 }
-
-/* for the exploding layer diagrams */
-button {
-    font-weight: bold;
-    margin-right: 1em;
-}
-.layer {
-    transition: transform 2s;
-    transform: none;
-}
-.layer .glass {
-    transition: opacity 2s;
-    opacity: 0.0;
-    fill: hsl(120,10%,90%);
-    fill-opacity: 0.3;
-    stroke: hsl(120,50%,10%);
-    stroke-opacity: 0.7;
-    stroke-width: 2px;
-    width: 550px;
-    height: 220px;
-}
-.rotated .layer .glass {
-    opacity: 1.0;
-}
-.rotated .layer-0 { transform: translateY(190px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }
-.rotated .layer-1 { transform: translateY(170px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }
-.rotated .layer-2 { transform: translateY(150px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }
-.rotated .layer-3 { transform: translateY(130px) rotateX(60deg) rotateZ(-30deg) scale(0.9); }

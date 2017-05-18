@@ -4,6 +4,12 @@
 
 const scale = 22;
 
+function clamp(x, lo, hi) {
+    if (x < lo) { x = lo; }
+    if (x > hi) { x = hi; }
+    return x;
+}
+
 function lerp(start, end, t) {
     return start + t * (end-start);
 }
@@ -50,26 +56,21 @@ class Diagram {
     }
     
     addGrid() {
-        let g = this.parent.append('g');
+        let g = this.parent.append('g').attr('class', "grid");
         for (let x = 0; x < 25; x++) {
             for (let y = 0; y < 10; y++) {
                 g.append('rect')
                     .attr('transform', `translate(${x*scale}, ${y*scale})`)
                     .attr('width', scale)
-                    .attr('height', scale)
-                    .attr('fill', "hsl(0,10%,95%)")
-                    .attr('stroke', "gray");
+                    .attr('height', scale);
             }
         }
         return this;
     }
 
     addTrack() {
-        let g = this.parent.append('g');
-        let line = g.append('line')
-            .attr('fill', "none")
-            .attr('stroke', "gray")
-            .attr('stroke-width', 3);
+        let g = this.parent.append('g').attr('class', "track");
+        let line = g.append('line');
         this.onUpdate(() => {
             line
                 .attr('x1', (this.A.x + 0.5) * scale)
@@ -85,7 +86,7 @@ class Diagram {
         this.N = N;
         this.makeScrubbableNumber('t', 0.0, 1.0, 2);
         this.makeScrubbableNumber('N', 1, 30, 0);
-        let g = this.parent.append('g');
+        let g = this.parent.append('g').attr('class', "interpolated");
         this.onUpdate(() => {
             let points = this.t != null? [lerpPoint(this.A, this.B, this.t)]
                 : this.N != null? interpolationPoints(this.A, this.B, this.N)
@@ -93,7 +94,6 @@ class Diagram {
             let circles = g.selectAll("circle").data(points);
             circles.exit().remove();
             circles.enter().append('circle')
-                .attr('fill', "hsl(0,30%,50%)")
                 .attr('r', radius)
                 .merge(circles)
                 .attr('transform',
@@ -104,7 +104,7 @@ class Diagram {
 
     addInterpolationLabels() {
         // only works if we already have called addInterpolated()
-        let g = this.parent.append('g');
+        let g = this.parent.append('g').attr('class', "interpolation-labels");
         this.onUpdate(() => {
             let points = interpolationPoints(this.A, this.B, this.N);
             var offset = Math.abs(this.B.y - this.A.y)
@@ -125,7 +125,7 @@ class Diagram {
     }
 
     addRoundedPoints() {
-        let g = this.parent.append('g');
+        let g = this.parent.append('g').attr('class', "rounded");
         this.onUpdate(() => {
             let N = this.N == null? lineDistance(this.A, this.B) : this.N;
             let points = interpolationPoints(this.A, this.B, N).map(roundPoint);
@@ -134,7 +134,6 @@ class Diagram {
             squares.enter().append('rect')
                 .attr('width', scale)
                 .attr('height', scale)
-                .attr('fill', "hsl(0,40%,70%)")
                 .merge(squares)
                 .attr('transform', (p) => `translate(${p.x*scale}, ${p.y*scale})`);
         });
@@ -142,7 +141,7 @@ class Diagram {
     }
         
     addHandles() {
-        let g = this.parent.append('g');
+        let g = this.parent.append('g').attr('class', "handles");
         this.makeDraggableCircle(g, this.A);
         this.makeDraggableCircle(g, this.B);
         return this;
@@ -150,11 +149,15 @@ class Diagram {
 
     makeDraggableCircle(parent, P) {
         let diagram = this;
-        let circle = parent.append('circle')
+        let circle = parent.append('g')
             .attr('class', "draggable")
-            .attr('r', scale*0.75)
-            .attr('fill', "hsl(0,50%,50%)")
             .call(d3.drag().on('drag', onDrag));
+        circle.append('circle')
+            .attr('class', "invisible")
+            .attr('r', 20);
+        circle.append('circle')
+            .attr('class', "visible")
+            .attr('r', 6.5);
 
         function updatePosition() {
             circle.attr('transform',
@@ -162,8 +165,8 @@ class Diagram {
         }
         
         function onDrag() {
-            P.x = Math.floor(d3.event.x / scale);
-            P.y = Math.floor(d3.event.y / scale);
+            P.x = clamp(Math.floor(d3.event.x / scale), 0, 24);
+            P.y = clamp(Math.floor(d3.event.y / scale), 0, 9);
             updatePosition();
             diagram.update();
         }
