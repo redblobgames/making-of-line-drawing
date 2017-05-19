@@ -206,7 +206,8 @@ let diagram_rounding = new Diagram('point-rounding')
     .addTrack()
     .addRoundedPoints()
     .addInterpolated(null, 5, 2.5)
-    .addHandles();
+    .addHandles()
+    .addInterpolationLabels();
 diagram_rounding.onUpdate(() => {
     let distance = lineDistance(diagram_rounding.A, diagram_rounding.B);
     diagram_rounding.root.selectAll(".optimal-N")

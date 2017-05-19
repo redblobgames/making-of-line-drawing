@@ -21,9 +21,13 @@ button {
 
 People have asked me how I write my interactive tutorials. I can point at the final result but the final result doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]]:
 
+#+begin_comment
+On iOS, the iframe takes up the full height instead of honoring the height= attribute. Workaround? https://salomvary.github.io/iframe-resize-ios-safari.html
+#+end_comment
+
 #+begin_export html
 <!-- 750 == 600 / 0.8 -->
-<iframe id="iframe" src="/grids/line-drawing.html#interpolation" width="750" height="300"  style="transform:scale(0.8);transform-origin:left top"/>
+<iframe id="iframe" src="/grids/line-drawing.html#interpolation" width="750" height="300" style="height:300px;transform:scale(0.75);transform-origin:left top;overflow-y:scroll"/>
 #+end_export
 
 It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step.
@@ -229,7 +233,7 @@ The third diagram has yet a different visualization layer, but it will be easier
 #+include: "8/line-drawing.js" src js :lines "17-26"
 
 #+begin_export html
-<iframe src="8/" width="600" height="350"/>
+<iframe src="8/" width="600" height="300"/>
 #+end_export
 
 The drawing code turns out to be very similar to the previous case so I made it read either /t/ or /N/:
@@ -270,19 +274,18 @@ This diagram has all the essential components but it could look nicer.
 
 Although I have the essentials working, I usually spend a lot of time after that making the diagrams both look good and feel good.
 
-- The code I originally wrote fails when the line distance is zero, e.g. when the start and end points are the same. I added a special case in =interpolationPoints= for ~N == 0~.
-- You can drag the markers outside the grid; I restricted that movement.
-- It's often better to specify the styles in CSS so that you can override them for a specific diagram.
-- It's usually better to use HSL colors than RGB colors; they're much easier to work with. My rule of thumb is to start with medium colors =hsl(h,50%,50%)= for any 0 ≤ h < 360, and then tweak saturation and lightness.
-
-- [ ] The grid looks better when the borders /aren't/ drawn; to make that work I need to shrink the boxes by one pixel so that there's a gap between them.
-- [ ] {Track} wider, translucent to see grid underneath
-- [ ] The drag handles would look nice when they fit into the "track", but we want the mouse-sensitive hit area to continue to be large. Smaller handles also don't interfere with labels and the squares that show the drawn line.
-- [ ] Once the track is wider we can place smaller interpolation points into it, with border
-- [ ] If I make the rounded point squares translucent you can see the track underneath, with border too
-- [ ] Mouse pointer
-- [ ] Scrubbable number hit size, consistent size
-- [ ] Drop shadows
+- Special cases: the code I originally wrote fails when the line distance is zero, e.g. when the start and end points are the same. I added a special case in =interpolationPoints= for ~N == 0~.
+- Bounds checking: the reader can drag the markers outside the grid; I restricted that movement.
+- Ease of styling: it's often better to specify the styles in CSS so that I can override them for a specific diagram.
+- Ease of choosing colors: it's usually better to use HSL colors than RGB colors; they're much easier to work with. My rule of thumb is to start with medium colors =hsl(h,50%,50%)= for any 0 ≤ h < 360, and then tweak saturation and lightness.
+- Relative importance: the drag handles should have a bolder look than minor elements like the numeric labels on the interpolation points.
+- Grid style: I think the grid looks better when the borders /aren't/ drawn. It also makes it easier to see the numeric labels.
+- Track style: I made the "track" line wider, lighter, and translucent so that the reader can see the grid underneath.
+- Midpoints style: with a larger track, I made the interpolation points smaller to fit inside the track.
+- Drawn line style: I made the line squares translucent so the reader can see the track underneath. It also lets the reader see when the same square gets drawn twice.
+- Drag handle style: the handles look nicer when they fit into the track, and they also stop interfering with the labels. The problem is then the mouse sensitive area becomes too small. I solved this by having /two/ circles. The visible circle is small and fits into the track; there's also an invisible circle that catches the mouse events.
+- Scrubbable number style: the number is way too small and it's especially hard to get on touch devices. I made the area larger and forced it to keep a consistent size as the number of digits changes.
+- Interaction feedback: I change the CSS =cursor= when the mouse is over an interactable element (drag handles and the scrubbable numbers). I also draw drop shadows. The combination makes the interactive elements respond immediately, telling the reader that they're the right things to click on.
 
 #+begin_export html
 <iframe src="10/" width="600" height="300"/>
@@ -294,11 +297,13 @@ Although I have the essentials working, I usually spend a lot of time after that
 :CUSTOM_ID: final
 :END:
 
-{diagram}
+{each diagram on the page is an assembly of different layers -- use checkboxes to control which layers are included}
+
+{have another page with the final page}
 
 #+begin_export html
-<script src="https://d3js.org/d3.v4.min.js"/>
-<script src="making-of.js"/>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="making-of.js"></script>
 #+end_export
 
 #+begin_footer

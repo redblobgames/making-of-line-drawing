@@ -2,8 +2,6 @@
 // Copyright 2017 Red Blob Games <redblobgames@gmail.com>
 // License: Apache v2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
 
-console.info("I'm happy to answer questions about the code; email me at redblobgames@gmail.com");
-
 /*
   I want to make an "exploded" view of the layers in a diagram.
 
@@ -14,11 +12,19 @@ console.info("I'm happy to answer questions about the code; email me at redblobg
   <rect.glass> that gives it a greenish tint and a green border.
 */
 
-function injectLayers(iframe) {
+function addCssToggleCheckbox(selection, controls, className, label) {
+    let container = controls.append('label');
+    let checkbox = container.append('input')
+        .attr('type', "checkbox")
+        .on('change', () => { selection.classed(className, checkbox.property('checked')); });
+    container.append('span').text(label);
+}
+
+function injectLayers(iframe, callback) {
     let root = d3.select(iframe.node().contentDocument);
     if (root.select("svg").size() == 0) {
         // Document not ready yet
-        iframe.on('load', () => { injectLayers(iframe); });
+        iframe.on('load', () => { injectLayers(iframe, callback); });
         return;
     }
 
@@ -35,15 +41,24 @@ function injectLayers(iframe) {
         });
 
     let controls = d3.select(iframe.node().parentNode.insertBefore(document.createElement('div'), iframe.node().nextElementSibling));
-    controls.append('button')
-        .text("show layers")
-        .on('click', () => { root.select("svg").attr('class', "rotated"); });
-    controls.append('button')
-        .text("hide layers")
-        .on('click', () => { root.select("svg").attr('class', ""); });
+    addCssToggleCheckbox(root.select("svg"), controls, 'rotated', "Show layers");
+    
+    if (callback) { callback(root, controls); };
 }
 
 injectLayers(d3.select('iframe[src="7/"]'));
 injectLayers(d3.select('iframe[src="8/"]'));
 injectLayers(d3.select('iframe[src="9/"]'));
-injectLayers(d3.select('iframe[src="10/"]'));
+injectLayers(d3.select('iframe[src="10/"]'),
+             (root, controls) => {
+                 let body = root.select("body");
+                 let div = controls.append('div').text("Improve:");
+                 addCssToggleCheckbox(body, div, 'improve-grid', "grid");
+                 addCssToggleCheckbox(body, div, 'improve-track', "track");
+                 addCssToggleCheckbox(body, div, 'improve-interpolated', "midpoints");
+                 addCssToggleCheckbox(body, div, 'improve-rounded', "line");
+                 addCssToggleCheckbox(body, div, 'improve-handles', "handles");
+                 addCssToggleCheckbox(body, div, 'improve-scrubbable', "scrubbable");
+                 addCssToggleCheckbox(body, div, 'improve-dropshadows', "drop shadows");
+             });
+
