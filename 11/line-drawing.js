@@ -162,7 +162,7 @@ class Diagram {
         return this;
     }
 
-    addRoundedPoints() {
+    addLine() {
         let g = this.parent.append('g');
         this.onUpdate(() => {
             let N = this.N == null? lineDistance(this.A, this.B) : this.N;
@@ -236,14 +236,35 @@ class Diagram {
 }
 
 
-let diagram_rounding = new Diagram('point-rounding')
+let diagram1 = new Diagram('demo')
+    .addGrid()
+    .addLine()
+    .addHandles();
+
+let diagram2 = new Diagram('linear-interpolation')
+    .addLerpValues();
+
+let diagram3 = new Diagram('interpolate-t')
     .addGrid()
     .addTrack()
-    .addRoundedPoints()
+    .addInterpolated(0.5, null, 4)
+    .addHandles();
+
+let diagram4 = new Diagram('interpolate-N')
+    .addGrid()
+    .addTrack()
+    .addInterpolated(null, 5, 4)
+    .addHandles()
+    .addInterpolationLabels();
+
+let diagram5 = new Diagram('point-rounding')
+    .addGrid()
+    .addTrack()
+    .addLine()
     .addInterpolated(null, 5, 2.5)
     .addHandles();
-diagram_rounding.onUpdate(() => {
-    let distance = lineDistance(diagram_rounding.A, diagram_rounding.B);
-    diagram_rounding.root.selectAll(".optimal-N")
+diagram5.onUpdate(() => {
+    let distance = lineDistance(diagram5.A, diagram5.B);
+    diagram5.root.selectAll(".optimal-N")
         .text(distance);
 });

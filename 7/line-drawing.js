@@ -126,4 +126,5 @@ class Diagram {
 }
 
 
-let diagram = new Diagram('linear-interpolation');
+let diagram1 = new Diagram('demo');
+let diagram2 = new Diagram('linear-interpolation');

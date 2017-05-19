@@ -4,6 +4,17 @@
 
 const scale = 22;
 
+function pointsOnLine(P, Q) {
+    let points = [];
+    let N = Math.max(Math.abs(P.x-Q.x), Math.abs(P.y-Q.y));
+    for (let i = 0; i <= N; i++) {
+        let t = i / N;
+        let x = Math.round(P.x + (Q.x - P.x) * t);
+        let y = Math.round(P.y + (Q.y - P.y) * t);
+        points.push({x: x, y: y});
+    }
+    return points;
+}
 
 function lerp(start, end, t) {
     return start + t * (end-start);
@@ -176,7 +187,16 @@ class Diagram {
 }
 
 
-let diagram_t = new Diagram('layers')
+// diagram1 works again, now that the Diagram class lets us choose which layers to use
+let diagram1 = new Diagram('demo')
+    .addGrid()
+    .addLine()
+    .addHandles();
+
+let diagram2 = new Diagram('linear-interpolation')
+    .addLerpValues();
+
+let diagram3 = new Diagram('interpolate-t')
     .addGrid()
     .addTrack()
     .addInterpolated(0.5)

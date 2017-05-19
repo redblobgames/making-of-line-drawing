@@ -16,6 +16,7 @@ button {
 .ref {
     width: 30%;
     margin-left: auto;
+    font-size: 80%;
     text-align: center;
     background-color: hsl(60,10%,95%);
     border: 1px solid hsl(0,10%,80%);
@@ -30,7 +31,7 @@ input[type="checkbox"], label {
 <script src="https://d3js.org/d3.v4.min.js"></script>
 #+end_export
 
-People have asked me how I write my interactive tutorials. I can point at the final result but the final result doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]].
+People have asked me how I write my interactive tutorials. I can point at the final result but the final result doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3.org/][d3.js v4]].
 
 { TODO: diagram showing the type of diagram I'm making }
 
@@ -53,18 +54,12 @@ I attach an ~id=~ to an html element so that I can get to it from Javascript, us
 
 #+include: "1/index.html" src html
 
-I'll omit the header and footer from the rest of the examples.
+I'll omit the header and footer from the rest of the examples. Click the filename on the upper right to see the entire page up to that point.
 
 
 ** TODO Tense
 
 Do I want present tense or future tense? Imperative or declarative? Go through the text and make sure it's all consistent
-
-** TODO Page should be accumulative
-
-Each directory should include everything for all the previous directories too.
-
-Each directory's index.html should include /all/ the diagrams, and then the main page can go in and hide all but the one we want to show. Tricky!
 
 * Diagram
 :PROPERTIES:
@@ -73,17 +68,15 @@ Each directory's index.html should include /all/ the diagrams, and then the main
 
 Sometimes I'll add a diagram first and then add some text; other times I'll start with the text and then figure out the diagrams. For this page I'll start with a diagram.
 
-The tutorial is about drawing lines on a square grid, so I need to draw a grid and also draw lines. I'll draw a grid with Javascript, using the [[https://d3js.org/][d3.js library]]:
-
-{ MOVE d3.js to top }
+The tutorial is about drawing lines on a square grid, so I need to draw a grid and also draw lines. I'll draw a grid with Javascript:
 
 #+begin_export html
-<iframe src="2/" width="600" height="250"/>
+<iframe src="2/" data-show="demo" width="600" height="250"/>
 #+end_export
 
 #+include: "2/line-drawing.js" src js :lines "4-"
 
-There's some tweaking on grid sizes. I could parameterize it and calculate it properly but often times I will hard-code it when I'm just starting out, and only calculate it if I need to. Here my svg is 550px wide and I picked squares that are 22px, so 25 of them fit across. Vertically I can fit 10 squares in 220px so I changed the svg height from 200 to 220 to fit.
+I tried a few different grid sizes. I could parameterize it and calculate it properly but often times I will hard-code it when I'm just starting out, and only calculate it if I need to. Here my svg is 550px wide and I picked squares that are 22px, so 25 of them fit across. Vertically I can fit 10 squares in 220px so I changed the svg height from 200 to 220 to fit.
 
 Those of you who know SVG might choose to use =viewBox= or =transform= to change the coordinate system to place points at the center of each grid square instead of at the top left, and also to scale things so that each grid square is 1 unit across instead of =scale= pixels. I did this in the original article but I didn't for this tutorial.
 
@@ -95,7 +88,7 @@ Those of you who know SVG might choose to use =viewBox= or =transform= to change
 The main algorithm I'm trying to demonstrate on the page is drawing a line on a grid. I need to implement that algorithm and a visualization for it.
 
 #+begin_export html
-<iframe src="3/" width="600" height="250"/>
+<iframe src="3/" data-show="demo" width="600" height="250"/>
 #+end_export
 
 #+include: "3/line-drawing.js" src js :lines "18-"
@@ -112,7 +105,7 @@ This is just the beginning. It's a working implementation of the algorithm and a
 What I most often do for interaction is let the reader change the inputs to the algorithm. For line drawing, the inputs are the two endpoints, =A= and =B= in the code.
 
 #+begin_export html
-<iframe src="4/" width="600" height="250"/>
+<iframe src="4/" data-show="demo" width="600" height="250"/>
 #+end_export
 
 #+include: "4/line-drawing.js" src js :lines "31-"
@@ -126,7 +119,7 @@ This code lets me update =A= and =B= but it doesn't recalculate the line.
 To be able to update the line, I need to move the drawing code into a function that I can call again, and I also need to reuse the =<rect>= elements I've previously created. It's useful to use [[https://bost.ocks.org/mike/circles/][d3's enter-exit pattern]] here; it will let me reuse, create, or remove elements as my data changes. To use it, I need a container for the =<rect>= elements; I put it in a variable ~gPoints~. I also need to separate the logic for the /algorithm/ (function ~pointsOnLine~) from the logic for /drawing/ (function ~redraw~).
 
 #+begin_export html
-<iframe src="5/" width="600" height="250"/>
+<iframe src="5/" data-show="demo" width="600" height="250"/>
 #+end_export
 
 #+include: "5/line-drawing.js" src js :lines "18-"
@@ -152,7 +145,7 @@ To explain how an algorithm works, I sometimes break it down into the steps of t
 Since I'm going to have multiple diagrams, it'll be useful to encapsulate all those global variables and functions into a diagram object.
 
 #+begin_export html
-<iframe src="6/" width="600" height="250"/>
+<iframe src="6/" data-show="demo" width="600" height="250"/>
 #+end_export
 
 #+include: "6/line-drawing.js" src js :lines "21-"
@@ -181,7 +174,7 @@ How did I want this to work?
 There are other things that you may want for scrubbable numbers but these are all I needed for this tutorial. I decided that within a named ~<div>~ section I'd find all the ~<span data-name="XYZ">~ and turn them into scrubable numbers stored in field XYZ. I ended up only having two names, =t= and =N=, but I didn't realize this until later.
 
 #+begin_export html
-<iframe src="7/" width="600" height="150"/>
+<iframe src="7/" data-show="linear-interpolation" width="600" height="150"/>
 #+end_export
 
 Scrubbable numbers are cool but a little bit tricky. I used d3-drag to tell me how far left/right the mouse was dragged. Then I scaled the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
@@ -203,16 +196,16 @@ This "diagram" doesn't really fit the model that the rest of the diagrams use so
 
 Using linear interpolation of numbers, I wanted to display the linear interpolation of points. I wanted a diagram that lets you modify 0 ≤ t ≤ 1, and shows the resulting point. Until now I had the final algorithm written in =pointsOnLine=. To split up the diagrams I also need to split the line drawing algorithm into separate steps.
 
-#+include: "8/line-drawing.js" src js :lines "8-19"
+#+include: "8/line-drawing.js" src js :lines "20-28"
 
 #+begin_export html
-<iframe src="8/" width="600" height="300"/>
+<iframe src="8/" data-show="interpolate-t" width="600" height="300"/>
 #+end_export
 
 I'm starting to organize things in terms of layers, which have the /creation/ code and the /update/ code:
 
-#+include: "8/line-drawing.js" src js :lines "67-81"
-#+include: "8/line-drawing.js" src js :lines "115-127"
+#+include: "8/line-drawing.js" src js :lines "66-81"
+#+include: "8/line-drawing.js" src js :lines "114-126"
 
 Note that this diagram does /not/ show the line drawn on a grid. That's another reason I want to use diagram layers for this page. While working on this diagram I commented out the code for drawing the line.
 
@@ -224,20 +217,20 @@ Note that this diagram does /not/ show the line drawn on a grid. That's another 
 There are now two diagrams on the page. Both display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. There will be more diagrams soon. When I'm writing a tutorial that requires multiple diagrams, each with different features, I like to divide the diagrams into /layers/, and then stack them on top of each other. There are four layers in the previous diagram: /grid/, /track/, /interpolation point/, and /drag handle/. Click “Show layers” to see them:
 
 #+begin_export html
-<iframe src="9/" width="600" height="300"/>
+<iframe src="9/" data-show="interpolate-t" width="600" height="300"/>
 #+end_export
 
 Each layer will be created by a method that adds a =<g>= for a layer, and also adds its /update/ function to the diagram object. Here's the code for managing the update functions:
 
-#+include: "9/line-drawing.js" src js :lines "19-35"
+#+include: "9/line-drawing.js" src js :lines "38-46"
 
 I no longer need to put the =<g>= elements into fields in the diagram object (e.g. =gGrid=, =gHandles=, etc.); they can remain local variables in the =add= functions. Look at =addTrack()= now:
 
-#+include: "9/line-drawing.js" src js :lines "51-66"
+#+include: "9/line-drawing.js" src js :lines "62-77"
 
 I can now assemble a diagram by calling the =addXYZ()= functions:
 
-#+include: "9/line-drawing.js" src js :lines "179-"
+#+include: "9/line-drawing.js" src js :lines "199-"
 
 I /don't/ have a generic layer system that I use across my tutorials. I make one specific for each tutorial that needs it. Each tutorial's needs have been different. The one here is only 8 lines of code; it's not worth writing a separate library for that.
 
@@ -248,21 +241,21 @@ I /don't/ have a generic layer system that I use across my tutorials. I make one
 
 The third diagram has yet a different visualization layer, but it will be easier to implement now that I have layers. Until now I had the line drawing algorithm choose N. I need to separate that out too.
 
-#+include: "10/line-drawing.js" src js :lines "17-26"
+#+include: "10/line-drawing.js" src js :lines "28-36"
 
 #+begin_export html
-<iframe src="10/" width="600" height="300"/>
+<iframe src="10/" data-show="interpolate-N" width="600" height="300"/>
 #+end_export
 
 The drawing code turns out to be very similar to the previous case so I made it read either /t/ or /N/:
 
-#+include: "10/line-drawing.js" src js :lines "114-135"
+#+include: "10/line-drawing.js" src js :lines "125-146"
 
 I also had to extend my scrubbable number implementation. Previously, I wanted floating point values but here I want it to round to an integer. I decided the easiest way to do this was to =parseFloat= the formatted output; that way it'd work no matter how many digits I'm rounding to. See the =formatter= in =makeScrubbableNumber()=.
 
 I also added another layer for labels:
 
-#+include: "10/line-drawing.js" src js :lines "136-157"
+#+include: "10/line-drawing.js" src js :lines "147-168"
 
 The labels are overlapping the drag handles. This and a lot of other things I'll fix later.
 
@@ -278,7 +271,7 @@ We already know how to round numbers to the nearest integer. To snap points to t
 I drew this on another layer.
 
 #+begin_export html
-<iframe src="11/" width="600" height="300"/>
+<iframe src="11/" data-show="point-rounding" width="600" height="300"/>
 #+end_export
 
 I also want to tell people when they've reached the optimal N, which is max(Δx,Δy).
@@ -306,9 +299,10 @@ Although I have the essentials working, I usually spend a lot of time after that
 - Interaction feedback: I change the CSS =cursor= when the mouse is over an interactable element (drag handles and the scrubbable numbers). I also draw drop shadows. The combination makes the interactive elements respond immediately, telling the reader that they're the right things to click on.
 
 #+begin_export html
-<iframe src="12/" width="600" height="300"/>
+<iframe src="12/" data-show="point-rounding" width="600" height="300"/>
 #+end_export
 
+There are even more ways to make the page better but these will give a lot of benefit for little effort.
 
 * Putting it all together
 :PROPERTIES:

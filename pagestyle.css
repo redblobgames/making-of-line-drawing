@@ -16,6 +16,9 @@ header, footer {
     background-color: hsl(60,20%,80%);
     padding: 0.5em;
 }
+footer {
+    min-height: 3em;
+}
 svg {
     overflow: visible;
 }

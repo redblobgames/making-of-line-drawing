@@ -17,7 +17,6 @@ function pointsOnLine(P, Q) {
     return points;
 }
 
-
 function lerp(start, end, t) {
     return start + t * (end-start);
 }
@@ -182,4 +181,8 @@ class Diagram {
 }
 
 
-let diagram = new Diagram('interpolate-t');
+// let diagram1 = new Diagram('demo');
+// diagram1 doesn't work because the Diagram object is hard-coded to support interpolate-t
+
+let diagram2 = new Diagram('linear-interpolation');
+let diagram3 = new Diagram('interpolate-t');

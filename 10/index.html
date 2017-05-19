@@ -7,6 +7,48 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
   <body>
+    <header>
+      <h1>Line drawing</h1>
+    </header>
+    <p>
+      On a grid map, line drawing is useful for for visibility, the
+      path of an arrow/bullet, and enemy AI. There are several fast
+      algorithms for this but I prefer using a very simple algorithm.
+      Here's the algorithm in action:
+    </p>
+    <div id="demo">
+      <svg width="550" height="220">
+      </svg>
+    </div>
+    <h2>Linear interpolation: numbers</h2>
+    <p>
+      Let's look at <u>l</u>inear int<u>erp</u>olation, or <em>lerp</em>, for numbers:
+    </p>
+    <div id="linear-interpolation">
+      <pre>
+lerp(  0,   1, <span data-name="t"></span>) = <span id="lerp1"></span>
+lerp(  0, 100, <span data-name="t"></span>) = <span id="lerp2"></span>
+lerp(  3,   5, <span data-name="t"></span>) = <span id="lerp3"></span>
+lerp(  5,   3, <span data-name="t"></span>) = <span id="lerp4"></span>
+      </pre>
+    </div>
+    <h2>Linear interpolation: points</h2>
+    <p>
+      Let's look at linear interpolation for points. We can separately
+      linearly interpolate the x and y values, and it behaves as we
+      might expect:
+    </p>
+    <div id="interpolate-t">
+      <svg width="550" height="220">
+      </svg>
+      <p>
+        Try varying t = <span data-name="t"></span>.
+      </p>
+    </div>
+    <h2>Number of points</h2>
+    <p>
+      Instead of picking 1 interpolation point, let's pick N of them:
+    </p>
     <div id="interpolate-N">
       <svg width="550" height="220">
       </svg>
@@ -15,5 +57,14 @@
       </p>
     </div>
     <script src="line-drawing.js"></script>
+    <footer xmlns:dct="http://purl.org/dc/terms/" xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#">
+      <a rel="license"
+         style="float:left;width:100px;margin-right:1em"
+         href="http://creativecommons.org/publicdomain/zero/1.0/">
+        <img src="http://i.creativecommons.org/p/zero/1.0/88x31.png" style="border-style: none;" alt="CC0" />
+      </a>
+      This page is in the <a href="https://creativecommons.org/publicdomain/zero/1.0/">public domain</a>.
+      Use it as you wish. Attribution is not necessary, but appreciated.
+    </footer>
   </body>
 </html>
