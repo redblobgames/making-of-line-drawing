@@ -3,7 +3,21 @@
 // License: Apache v2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
 
 const scale = 22;
+let parent = d3.select("#demo svg");
 
+for (let x = 0; x < 25; x++) {
+    for (let y = 0; y < 10; y++) {
+        parent.append('rect')
+            .attr('transform', `translate(${x*scale}, ${y*scale})`)
+            .attr('width', scale)
+            .attr('height', scale)
+            .attr('fill', "white")
+            .attr('stroke', "gray");
+    }
+}
+
+let A = {x: 2, y: 2}, B = {x: 20, y: 8};
+let gPoints = parent.append('g');
 
 function pointsOnLine(P, Q) {
     let points = [];
@@ -17,59 +31,40 @@ function pointsOnLine(P, Q) {
     return points;
 }
 
+function redraw() {
+    let rects = gPoints.selectAll('rect').data(pointsOnLine(A, B));
+    rects.exit().remove();
+    rects.enter().append('rect')
+        .attr('width', scale-1)
+        .attr('height', scale-1)
+        .attr('fill', "hsl(0,40%,70%)")
+        .merge(rects)
+        .attr('transform', (p) => `translate(${p.x*scale}, ${p.y*scale})`);
+}
+    
 
-function lerp(start, end, t) {
-    return start + t * (end-start);
+function makeDraggableCircle(point) {
+    let circle = parent.append('circle')
+        .attr('class', "draggable")
+        .attr('r', scale*0.75)
+        .attr('fill', "hsl(0,50%,50%)")
+        .call(d3.drag().on('drag', onDrag));
+
+    function updatePosition() {
+        circle.attr('transform',
+                    `translate(${(point.x+0.5)*scale} ${(point.y+0.5)*scale})`);
+    }
+    
+    function onDrag() {
+        point.x = Math.floor(d3.event.x / scale);
+        point.y = Math.floor(d3.event.y / scale);
+        updatePosition();
+        redraw();
+    }
+
+    updatePosition();
 }
 
-class Diagram {
-    constructor(containerId) {
-        this.root = d3.select(`#${containerId}`);
-        this.t = 0.3;
-        this.A = {x: 2, y: 2};
-        this.B = {x: 20, y: 8};
-
-        this.makeScrubbableNumber('t', 0.0, 1.0, 2);
-        this.update();
-    }
-
-    update() {
-        let t = this.t;
-        function set(id, fmt, lo, hi) {
-            d3.select(id).text(d3.format(fmt)(lerp(lo, hi, t)));
-        }
-        set("#lerp1", ".2f", 0, 1);
-        set("#lerp2", ".0f", 0, 100);
-        set("#lerp3", ".1f", 3, 5);
-        set("#lerp4", ".1f", 5, 3);
-    }
-
-    makeScrubbableNumber(name, low, high, precision) {
-        let diagram = this;
-        let elements = diagram.root.selectAll(`[data-name='${name}']`);
-        let positionToValue = d3.scaleLinear()
-            .clamp(true)
-            .domain([-100, +100])
-            .range([low, high]);
-
-        function updateNumbers() {
-            elements.text(() => {
-                let format = `.${precision}f`;
-                return d3.format(format)(diagram[name]);
-            });
-        }
-
-        updateNumbers();
-
-        elements.call(d3.drag()
-                      .subject({x: positionToValue.invert(diagram[name]), y: 0})
-                      .on('drag', () => {
-                          diagram[name] = positionToValue(d3.event.x);
-                          updateNumbers();
-                          diagram.update();
-                      }));
-    }
-}
-
-
-let diagram = new Diagram('linear-interpolation');
+makeDraggableCircle(A);
+makeDraggableCircle(B);
+redraw();

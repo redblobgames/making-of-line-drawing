@@ -46,10 +46,10 @@ function injectLayers(iframe, callback) {
     if (callback) { callback(root, controls); };
 }
 
-injectLayers(d3.select('iframe[src="7/"]'));
-injectLayers(d3.select('iframe[src="8/"]'));
 injectLayers(d3.select('iframe[src="9/"]'));
-injectLayers(d3.select('iframe[src="10/"]'),
+injectLayers(d3.select('iframe[src="10/"]'));
+injectLayers(d3.select('iframe[src="11/"]'));
+injectLayers(d3.select('iframe[src="12/"]'),
              (root, controls) => {
                  let body = root.select("body");
                  let div = controls.append('div').text("Improve:");
@@ -62,3 +62,16 @@ injectLayers(d3.select('iframe[src="10/"]'),
                  addCssToggleCheckbox(body, div, 'improve-dropshadows', "drop shadows");
              });
 
+
+
+/* For each iframe I want to include links to each page and source */
+d3.selectAll("iframe").each(function(_, i) {
+    let src = this.getAttribute('src');
+    let div = document.createElement('div');
+    this.parentNode.insertBefore(div, this);
+    let selection = d3.select(div)
+        .attr('class', "ref");
+    selection.append('a').attr('href', src).text("Page");
+    selection.append('span').text(" + ");
+    selection.append('a').attr('href', "https://github.com/redblobgames/making-of-line-drawing/tree/master/" + src).text("Source");
+});

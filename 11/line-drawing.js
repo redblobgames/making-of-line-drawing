@@ -4,7 +4,6 @@
 
 const scale = 22;
 
-
 function lerp(start, end, t) {
     return start + t * (end-start);
 }
@@ -17,10 +16,18 @@ function lerpPoint(P, Q, t) {
 function interpolationPoints(P, Q, N) {
     let points = [];
     for (let i = 0; i <= N; i++) {
-        let t = i / N;
+        let t = N == 0? 0 : i / N;
         points.push(lerpPoint(P, Q, t));
     }
     return points;
+}
+
+function roundPoint(P) {
+    return {x: Math.round(P.x), y: Math.round(P.y) };
+}
+
+function lineDistance(A, B) {
+    return Math.max(Math.abs(A.x - B.x), Math.abs(A.y - B.y));
 }
 
 
@@ -111,7 +118,7 @@ class Diagram {
         return this;
     }
     
-    addInterpolated(t, N) {
+    addInterpolated(t, N, radius) {
         this.t = t;
         this.N = N;
         this.makeScrubbableNumber('t', 0.0, 1.0, 2);
@@ -125,7 +132,7 @@ class Diagram {
             circles.exit().remove();
             circles.enter().append('circle')
                 .attr('fill', "hsl(0,30%,50%)")
-                .attr('r', 5)
+                .attr('r', radius)
                 .merge(circles)
                 .attr('transform',
                    (p) => `translate(${(p.x+0.5)*scale}, ${(p.y+0.5)*scale})`);
@@ -154,7 +161,24 @@ class Diagram {
         });
         return this;
     }
-            
+
+    addRoundedPoints() {
+        let g = this.parent.append('g');
+        this.onUpdate(() => {
+            let N = this.N == null? lineDistance(this.A, this.B) : this.N;
+            let points = interpolationPoints(this.A, this.B, N).map(roundPoint);
+            let squares = g.selectAll("rect").data(points);
+            squares.exit().remove();
+            squares.enter().append('rect')
+                .attr('width', scale)
+                .attr('height', scale)
+                .attr('fill', "hsl(0,40%,70%)")
+                .merge(squares)
+                .attr('transform', (p) => `translate(${p.x*scale}, ${p.y*scale})`);
+        });
+        return this;
+    }
+        
     addHandles() {
         let g = this.parent.append('g');
         this.makeDraggableCircle(g, this.A);
@@ -212,9 +236,14 @@ class Diagram {
 }
 
 
-let diagram_N = new Diagram('interpolate-N')
+let diagram_rounding = new Diagram('point-rounding')
     .addGrid()
     .addTrack()
-    .addInterpolated(null, 5)
-    .addHandles()
-    .addInterpolationLabels();
+    .addRoundedPoints()
+    .addInterpolated(null, 5, 2.5)
+    .addHandles();
+diagram_rounding.onUpdate(() => {
+    let distance = lineDistance(diagram_rounding.A, diagram_rounding.B);
+    diagram_rounding.root.selectAll(".optimal-N")
+        .text(distance);
+});
