@@ -23,7 +23,7 @@
         .improve-handles g.handles circle.invisible { fill-opacity: 0.0; }
         .improve-scrubbable span[data-name] {
             display: inline-block;
-            width: 20px;
+            width: 32px;
             padding: 4px 6px;
             text-align: center;
             line-height: 1.5;
@@ -91,11 +91,11 @@ lerp(  5,   3, <span data-name="t"></span>) = <span id="lerp4"></span>
         Try varying N = <span data-name="N"></span>.
       </p>
     </div>
-    <h3>Point rounding</h3>
+    <h2>Snap to grid</h2>
     <p>
       Now let's round each of those N points to the closest grid square:
     </p>
-    <div id="point-rounding">
+    <div id="snap-to-grid">
       <svg width="550" height="220">
         <defs>
           <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">

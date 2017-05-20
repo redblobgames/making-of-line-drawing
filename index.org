@@ -3,12 +3,13 @@
 
 #+begin_export html
 <style>
-iframe:not(.frameless) { 
+iframe { 
     border-radius: 5px 0 5px 5px;
     border: 1px solid hsl(0,10%,80%); 
     padding: 10px 23px; 
     box-shadow: inset 0 0 5px rgba(0,0,0,0.2); 
     background-color: hsl(60,10%,95%);
+    overflow: hidden;
 }
 button {
     margin-right: 1em;
@@ -33,11 +34,24 @@ input[type="checkbox"], label {
 
 People ask me how I write my interactive tutorials. I can point at the HTML+CSS+JS but that doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3.org/][d3.js v4]].
 
-{ TODO: diagram showing the type of diagram I'm making }
+#+begin_export html
+<iframe src="13/" data-show="demo" width="600" height="250"/>
+#+end_export
 
 It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step. I learn best by doing, so I recommend trying to recreate the diagrams yourself while following the tutorial.
 
 This is an /interactive tutorial about making interactive tutorials/.
+
+#+begin_export html
+<div id="ie-warning"/>
+<script>
+if (/Trident\//.test(navigator.userAgent)) {
+    d3.select("#ie-warning").text("NOTE: this page may not work in Internet Explorer.");
+} else if (/Edge\/15/.test(navigator.userAgent)) {
+    d3.select("#ie-warning").text("NOTE: the 'show styles' feature on this page may not work in Internet Explorer Edge.");
+}
+</script>
+#+end_export
 
 * Web page
 :PROPERTIES:
@@ -107,7 +121,7 @@ What I most often do for interaction is let the reader change the /inputs/ to th
 
 Great! It's pretty easy with [[https://github.com/d3/d3-drag][d3-drag]]. To help the reader know which elements are interactive, I set the CSS =cursor:move= over the draggable circles. 
 
-This code lets me update =A= and =B= but it doesn't recalculate the line. 
+This code lets me update the inputs =A= and =B= but it doesn't recalculate the output line. 
 
 * Redraw function
 
@@ -126,16 +140,12 @@ Great! Now I have an interactive diagram. But this isn't an /explanation/.
 :CUSTOM_ID: steps
 :END:
 
-To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[http://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I made a list of the steps in the code:
+To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[http://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I want to show the steps of the code:
 
-- Linear interpolation (lerp)
-  - of numbers
-  - of points
+- Linear interpolation of numbers
+- Linear interpolation of points
 - Number of steps in the line
-  - diagonal distance
-- Rounding
-  - of numbers
-  - of points
+- Snap to grid
 
 Since I'm going to have multiple diagrams, it'll be useful to encapsulate all those global variables and functions into a /diagram object/.
 
@@ -169,7 +179,7 @@ How do I want this to work?
 There are other things that you may want for scrubbable numbers but these are all I need for this tutorial. Within a named ~<div>~ section I'll find all the ~<span data-name="XYZ">~ and turn them into scrubable numbers stored in field XYZ of the diagram object.
 
 #+begin_export html
-<iframe src="7/" data-show="linear-interpolation" width="600" height="150"/>
+<iframe src="7/" data-show="linear-interpolation" width="600" height="120"/>
 #+end_export
 
 Scrubbable numbers are cool but a little bit tricky. I'm using d3-drag to tell me how far left/right the mouse was dragged. Then I scale the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
@@ -256,7 +266,7 @@ The labels are another layer:
 
 The labels are overlapping the drag handles. I'll fix this soon.
 
-* Rounding
+* Snap to grid
 :PROPERTIES:
 :CUSTOM_ID: rounding
 :END:
@@ -268,7 +278,7 @@ We already know how to round numbers to the nearest integer. To snap points to t
 I drew this on another layer.
 
 #+begin_export html
-<iframe src="11/" data-show="point-rounding" width="600" height="300"/>
+<iframe src="11/" data-show="snap-to-grid" width="600" height="300"/>
 #+end_export
 
 I also want to tell people when they've reached the optimal N, which is max(Δx,Δy).
@@ -296,19 +306,25 @@ Although I have the essentials working, I usually spend some time making the dia
 - Interaction feedback: I change the CSS =cursor= when the mouse is over an interactable element (drag handles and the scrubbable numbers). I also draw drop shadows. The combination makes the interactive elements respond immediately, telling the reader that they're the right things to click on.
 
 #+begin_export html
-<iframe src="12/" data-show="point-rounding" width="600" height="300"/>
+<iframe src="12/" data-show="snap-to-grid" width="600" height="300"/>
 #+end_export
 
-There are even more ways to make the page better but these will give a lot of benefit for little effort.
+There are lots more ways to make the page better but these will give a lot of benefit for little effort.
 
 * Putting it all together
 :PROPERTIES:
 :CUSTOM_ID: final
 :END:
 
-{each diagram on the page is an assembly of different layers -- use checkboxes to control which layers are included}
+Here's what the diagrams look like with the nicer styling.
 
-{have another page with all the diagrams}
+#+begin_export html
+<iframe src="13/" data-show="snap-to-grid" width="600" height="300"/>
+#+end_export
+
+Click the "13/index.html" link to see the full page and the "source" link to see the source code.
+
+The source code for the example tutorial is public domain, so please copy/fork it and use it to make your own tutorials!
 
 #+begin_export html
 <script src="making-of.js"></script>

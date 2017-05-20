@@ -7,7 +7,7 @@
 
   The diagrams are inside iframes. They're <svg> <g>…</g> <g>…</g> … </svg>.
 
-  I find the one diagram that matches the iframe's data-show=, then 
+  I find the one diagram that matches the iframe's data-show=, then
   I'm going to take each of those <g>s and put them inside a <g.layer> that
   has css 3d transforms to make the exploded view. See exploded-view.css.
   Also inside the <g.layer> but above its original contents I'm putting a
@@ -38,7 +38,10 @@ function injectLayers(iframe, callback) {
             let g = container.select("svg").append('g')
                 .attr('class', `layer layer-${i}`);
             g.node().appendChild(d3.select(this).remove().node());
-            g.append('rect').attr('class', "glass");
+            g.append('rect')
+                .attr('class', "glass")
+                .attr('width', 550)
+                .attr('height', 220);
         });
 
     let controls = d3.select(iframe.node().parentNode.insertBefore(document.createElement('div'), iframe.node().nextElementSibling));
@@ -85,7 +88,10 @@ function showOneElement(iframe) {
         iframe.addEventListener('load', () => { showOneElement(iframe); });
         return;
     }
-    
+
+    // Ugh, don't quite understand why most of the diagrams work but sometimes I need this
+    iframe.setAttribute('scrolling', "no");
+
     let id = iframe.getAttribute('data-show');
     root.selectAll("body > *:not(script)").each(function() {
         let element = d3.select(this);

@@ -3,11 +3,11 @@
 // License: Apache v2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
 
 const scale = 22;
-let parent = d3.select("#demo svg");
+let root = d3.select("#demo svg");
 
 for (let x = 0; x < 25; x++) {
     for (let y = 0; y < 10; y++) {
-        parent.append('rect')
+        root.append('rect')
             .attr('transform', `translate(${x*scale}, ${y*scale})`)
             .attr('width', scale)
             .attr('height', scale)
@@ -17,7 +17,7 @@ for (let x = 0; x < 25; x++) {
 }
 
 let A = {x: 2, y: 2}, B = {x: 20, y: 8};
-let gPoints = parent.append('g');
+let gPoints = root.append('g');
 
 function pointsOnLine(P, Q) {
     let points = [];
@@ -44,7 +44,7 @@ function redraw() {
     
 
 function makeDraggableCircle(point) {
-    let circle = parent.append('circle')
+    let circle = root.append('circle')
         .attr('class', "draggable")
         .attr('r', scale*0.75)
         .attr('fill', "hsl(0,50%,50%)")

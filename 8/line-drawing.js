@@ -171,7 +171,7 @@ class Diagram {
         updateNumbers();
 
         elements.call(d3.drag()
-                      .subject({x: positionToValue.invert(diagram[name]), y: 0})
+                      .subject(() => ({x: positionToValue.invert(diagram[name]), y: 0}))
                       .on('drag', () => {
                           diagram[name] = positionToValue(d3.event.x);
                           updateNumbers();

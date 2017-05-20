@@ -212,7 +212,7 @@ class Diagram {
 
         elements.call(
             d3.drag()
-                .subject({x: positionToValue.invert(diagram[name]), y: 0})
+                .subject(() => ({x: positionToValue.invert(diagram[name]), y: 0}))
                 .on('drag', () => {
                     diagram[name] = parseFloat(formatter(positionToValue(d3.event.x)));
                     updateNumbers();
@@ -243,7 +243,7 @@ let diagram4 = new Diagram('interpolate-N')
     .addHandles()
     .addInterpolationLabels();
 
-let diagram5 = new Diagram('point-rounding')
+let diagram5 = new Diagram('snap-to-grid')
     .addGrid()
     .addTrack()
     .addLine()
