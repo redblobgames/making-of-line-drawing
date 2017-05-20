@@ -31,13 +31,13 @@ input[type="checkbox"], label {
 <script src="https://d3js.org/d3.v4.min.js"></script>
 #+end_export
 
-People have asked me how I write my interactive tutorials. I can point at the final result but the final result doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3.org/][d3.js v4]].
+People ask me how I write my interactive tutorials. I can point at the HTML+CSS+JS but that doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3.org/][d3.js v4]].
 
 { TODO: diagram showing the type of diagram I'm making }
 
 It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step. I learn best by doing, so I recommend trying to recreate the diagrams yourself while following the tutorial.
 
-This is an /interactive tutorial about making interactive tutorials/ (about line drawing).
+This is an /interactive tutorial about making interactive tutorials/.
 
 * Web page
 :PROPERTIES:
@@ -55,11 +55,6 @@ I attach an ~id=~ to an html element so that I can get to it from Javascript, us
 #+include: "1/index.html" src html
 
 I'll omit the header and footer from the rest of the examples. Click the filename on the upper right to see the entire page up to that point.
-
-
-** TODO Tense
-
-Do I want present tense or future tense? Imperative or declarative? Go through the text and make sure it's all consistent
 
 * Diagram
 :PROPERTIES:
@@ -102,7 +97,7 @@ This is just the beginning. It's a working implementation of the algorithm and a
 :CUSTOM_ID: interaction
 :END:
 
-What I most often do for interaction is let the reader change the inputs to the algorithm. For line drawing, the inputs are the two endpoints, =A= and =B= in the code.
+What I most often do for interaction is let the reader change the /inputs/ to the algorithm and then I show the /outputs/. For line drawing, the inputs are the two endpoints, =A= and =B= in the code.
 
 #+begin_export html
 <iframe src="4/" data-show="demo" width="600" height="250"/>
@@ -131,7 +126,7 @@ Great! Now I have an interactive diagram. But this isn't an /explanation/.
 :CUSTOM_ID: steps
 :END:
 
-To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[http://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I listed the steps in the code:
+To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[http://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I made a list of the steps in the code:
 
 - Linear interpolation (lerp)
   - of numbers
@@ -142,7 +137,7 @@ To explain how an algorithm works, I sometimes break it down into the steps of t
   - of numbers
   - of points
 
-Since I'm going to have multiple diagrams, it'll be useful to encapsulate all those global variables and functions into a diagram object.
+Since I'm going to have multiple diagrams, it'll be useful to encapsulate all those global variables and functions into a /diagram object/.
 
 #+begin_export html
 <iframe src="6/" data-show="demo" width="600" height="250"/>
@@ -156,45 +151,45 @@ A pattern is starting to form, but I haven't made use of it yet. There's a =<g>=
 - the line
 - the draggable handles
 
-Each of these layers has some code to draw it and sometimes some code to update it. As I add more layers to the diagram I'll do something better with the draw and update code.
+Each of these layers has some code to draw it initially and sometimes some code to update it. As I add more layers to the diagram I'll do something better with the draw and update code.
 
 * Linear interpolation of numbers
 :PROPERTIES:
 :CUSTOM_ID: lerp-numbers
 :END:
 
-In this section I don't actually have a diagram, but I do have some interaction, so I'm going to use a diagram object anyway without an svg. I want to drag a number left and right to change it, and see how it affects some calculations. Take a look at Bret Victor's [[http://worrydream.com/Tangle/][Tangle library]] for inspiration. You might want to use his library directly. For this page I used [[https://github.com/d3/d3-drag][d3-drag]] instead.
+In this section I don't actually have a diagram, but I do have some interaction, so I'm going to use a diagram object anyway without an svg. I want to drag a number left and right to change it, and see how it affects some calculations. Take a look at Bret Victor's [[http://worrydream.com/Tangle/][Tangle library]] for inspiration. You might want to use his library directly. For this page I'm using [[https://github.com/d3/d3-drag][d3-drag]] instead.
 
-How did I want this to work?
+How do I want this to work?
 
 - I want to be able to “scrub” (drag) a number left/right.
 - I want to choose the formatting (e.g. =1.00= vs =1.0= vs =1=).
 - I want to be able to run the update function when the number changes.
 
-There are other things that you may want for scrubbable numbers but these are all I needed for this tutorial. I decided that within a named ~<div>~ section I'd find all the ~<span data-name="XYZ">~ and turn them into scrubable numbers stored in field XYZ. I ended up only having two names, =t= and =N=, but I didn't realize this until later.
+There are other things that you may want for scrubbable numbers but these are all I need for this tutorial. Within a named ~<div>~ section I'll find all the ~<span data-name="XYZ">~ and turn them into scrubable numbers stored in field XYZ of the diagram object.
 
 #+begin_export html
 <iframe src="7/" data-show="linear-interpolation" width="600" height="150"/>
 #+end_export
 
-Scrubbable numbers are cool but a little bit tricky. I used d3-drag to tell me how far left/right the mouse was dragged. Then I scaled the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
+Scrubbable numbers are cool but a little bit tricky. I'm using d3-drag to tell me how far left/right the mouse was dragged. Then I scale the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
 
 #+include: "7/line-drawing.js" src js :lines "101-126"
 
-When the number is dragged, I updated the display of the number, and I also called the diagram's =update= function to update any other aspect of the diagram:
+When the reader drags the number, I update the display of the number, and I also call the diagram's =update= function to update any other aspect of the diagram:
 
 #+include: "7/line-drawing.js" src js :lines "55-62"
 
-I also set the CSS to =cursor:col-resize= so that the reader can see it's interactive.
+I set the CSS to =cursor:col-resize= so that the reader can see it's interactive.
 
-This "diagram" doesn't really fit the model that the rest of the diagrams use so it ended up being hacky. That's ok though. Sometimes it's easier to keep the hack than to try to build a general abstraction that's only used once.
+This "diagram" doesn't really fit the model that the rest of the diagrams use so it is a bit hacky. That's ok though. Sometimes it's easier to keep the hack than to try to build a general abstraction that's only used once.
 
 * Linear interpolation of points
 :PROPERTIES:
 :CUSTOM_ID: lerp-points
 :END:
 
-Using linear interpolation of numbers, I wanted to display the linear interpolation of points. I wanted a diagram that lets you modify 0 ≤ t ≤ 1, and shows the resulting point. Until now I had the final algorithm written in =pointsOnLine=. To split up the diagrams I also need to split the line drawing algorithm into separate steps.
+Using linear interpolation of numbers, I want to display the linear interpolation of points. I want a diagram that lets you modify 0 ≤ t ≤ 1, and shows the resulting point. Until now I had the final algorithm written in =pointsOnLine=. To split up the diagrams I also need to split the line drawing algorithm into separate steps.
 
 #+include: "8/line-drawing.js" src js :lines "20-28"
 
@@ -214,13 +209,15 @@ Note that this diagram does /not/ show the line drawn on a grid. That's another 
 :CUSTOM_ID: layers
 :END:
 
-There are now two diagrams on the page. Both display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. There will be more diagrams soon. When I'm writing a tutorial that requires multiple diagrams, each with different features, I like to divide the diagrams into /layers/, and then stack them on top of each other. There are four layers in the previous diagram: /grid/, /track/, /interpolation point/, and /drag handle/. Click “Show layers” to see them:
+There are now two diagrams on the page. Both display the grid. The first diagram displays the grid line. The second diagram shows a non-grid line and also the interpolated point. Well, that's what should happen, but I broke the first diagram while making the second one work. There will be more diagrams soon. I need a way to make all of them work.
+
+When I'm writing a tutorial that requires multiple diagrams, each with different features, I like to divide the diagrams into /layers/, and then stack them on top of each other. There are four layers in the previous diagram: /grid/, /track/, /interpolation point/, and /drag handle/. Click “Show layers” to see them:
 
 #+begin_export html
 <iframe src="9/" data-show="interpolate-t" width="600" height="300"/>
 #+end_export
 
-Each layer will be created by a method that adds a =<g>= for a layer, and also adds its /update/ function to the diagram object. Here's the code for managing the update functions:
+I'll create each layer by a method that adds a =<g>= for a layer, then adds its /update/ function to the diagram object. Here's the code for managing the update functions:
 
 #+include: "9/line-drawing.js" src js :lines "38-46"
 
@@ -251,13 +248,13 @@ The drawing code turns out to be very similar to the previous case so I made it 
 
 #+include: "10/line-drawing.js" src js :lines "125-146"
 
-I also had to extend my scrubbable number implementation. Previously, I wanted floating point values but here I want it to round to an integer. I decided the easiest way to do this was to =parseFloat= the formatted output; that way it'd work no matter how many digits I'm rounding to. See the =formatter= in =makeScrubbableNumber()=.
+I also need to extend my scrubbable number implementation. Previously, I wanted floating point values but here I want it to round to an integer. An easy way to implement this is to =parseFloat= the formatted output; that way it works no matter how many digits I'm rounding to. See the =formatter= in =makeScrubbableNumber()=.
 
-I also added another layer for labels:
+The labels are another layer:
 
 #+include: "10/line-drawing.js" src js :lines "147-168"
 
-The labels are overlapping the drag handles. This and a lot of other things I'll fix later.
+The labels are overlapping the drag handles. I'll fix this soon.
 
 * Rounding
 :PROPERTIES:
@@ -283,7 +280,7 @@ This diagram has all the essential components but it could look nicer.
 :CUSTOM_ID: extras
 :END:
 
-Although I have the essentials working, I usually spend a lot of time after that making the diagrams both look good and feel good.
+Although I have the essentials working, I usually spend some time making the diagrams  look good and feel good.
 
 - Special cases: the code I originally wrote fails when the line distance is zero, e.g. when the start and end points are the same. I added a special case in =interpolationPoints= for ~N == 0~.
 - Bounds checking: the reader can drag the markers outside the grid; I restricted that movement.
@@ -319,6 +316,6 @@ There are even more ways to make the page better but these will give a lot of be
 
 #+begin_footer
 Created May 2017
-with [[http://orgmode.org/][Emacs Org-mode]], from [[file:index.org][index.org]]. Diagram use [[https://d3.org/][d3.js v4]]. All the HTML, CSS, and Javascript on the page is available [[https://github.com/redblobgames/making-of-line-drawing][on github/redblobgames]].
+with [[http://orgmode.org/][Emacs Org-mode]], from [[file:index.org][index.org]]. The diagrams use [[https://d3.org/][d3.js v4]]. All the HTML, CSS, and Javascript on the page is available [[https://github.com/redblobgames/making-of-line-drawing][on github/redblobgames]].
 Page last modified {{{modification-time(%F)}}}.
 #+end_footer
