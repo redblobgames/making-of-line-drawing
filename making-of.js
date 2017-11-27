@@ -64,6 +64,7 @@ injectLayers(d3.select('iframe[src="12/"]'),
                  addCssToggleCheckbox(root, div, 'improve-scrubbable', "scrubbable");
                  addCssToggleCheckbox(root, div, 'improve-dropshadows', "drop shadows");
              });
+injectLayers(d3.select('iframe[src="13/"]'));
 
 
 

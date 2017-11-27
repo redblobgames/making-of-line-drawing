@@ -1,7 +1,24 @@
-#+TITLE: Making of: Line drawing on a grid
+#+TITLE: Making of: Line drawing tutorial
 #+DATE: <2017-05-15>
 
+#+begin_comment
+<x:head> is used in my html preprocessor to put stuff into the <head> section of the page; org-mode doesn't have a way to do that normally
+
+This page is hard to make responsive, because of the iframes, so I left it in my 600px format.
+#+end_comment
+
 #+begin_export html
+<x:head>
+<x:width override="600"/>
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@redblobgames" />
+<meta name="og:url" content="https://www.redblobgames.com/making-of/line-drawing/" />
+<meta name="og:title" content="Making of: Line drawing tutorial" />
+<meta name="og:description" content="Interactive tutorial about making interactive tutorials" />
+<meta name="og:image" content="https://www.redblobgames.com/making-of/line-drawing/blog/image3.png" />
+<script src="https://d3js.org/d3.v4.min.js"></script>
+</x:head>
+
 <style>
 iframe { 
     border-radius: 5px 0 5px 5px;
@@ -24,23 +41,29 @@ button {
     border-bottom-width: 0px;
     border-radius: 5px 5px 0 0;
 }
+.intro-diagram .ref {
+    display: none;
+}
 input[type="checkbox"], label {
     cursor: pointer;
     font-weight: bold;
 }
 </style>
-<script src="https://d3js.org/d3.v4.min.js"></script>
 #+end_export
 
-People ask me how I write my interactive tutorials. I can point at the HTML+CSS+JS but that doesn't show the /process/. On this page I'll recreate the first half of my [[http://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3.org/][d3.js v4]].
+People ask me how I write my interactive tutorials. I can point at the HTML+CSS+JS but that doesn't show the /process/. On this page I'll recreate the first half of my [[https://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3js.org/][d3.js v4]].
 
 #+begin_export html
-<iframe src="13/" data-show="demo" width="600" height="250"/>
+<div class="intro-diagram">
+<iframe src="13/" data-show="demo" width="600" height="300"/>
+</div>
 #+end_export
 
-It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step. I learn best by doing, so I recommend trying to recreate the diagrams yourself while following the tutorial.
+It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step. 
 
 This is an /interactive tutorial about making interactive tutorials/.
+
+You should know some Javascript to follow the tutorial. It will help if you know some SVG and HTML. I use D3 here but the techniques would work with other libraries too. If you're interested in making your own, I recommend trying to recreate the diagrams yourself while following the tutorial.
 
 #+begin_export html
 <div id="ie-warning"/>
@@ -83,6 +106,8 @@ The tutorial is about drawing lines on a square grid, so I need to draw a grid a
 <iframe src="2/" data-show="demo" width="600" height="250"/>
 #+end_export
 
+Although d3 has a pattern for creating multiple elements with =selectAll()= + =data()= + =enter()=, I don't need that here so I'm just creating the elements directly:
+
 #+include: "2/line-drawing.js" src js :lines "4-"
 
 I tried a few different grid sizes. I could parameterize it and calculate it properly but often times I will hard-code it when I'm just starting out, and only calculate it if I need to. Here my svg is 550px wide and I picked squares that are 22px, so 25 of them fit across. Vertically I can fit 10 squares in 220px so I changed the svg height from 200 to 220 to fit.
@@ -124,6 +149,9 @@ Great! It's pretty easy with [[https://github.com/d3/d3-drag][d3-drag]]. To help
 This code lets me update the inputs =A= and =B= but it doesn't recalculate the output line. 
 
 * Redraw function
+:PROPERTIES:
+:CUSTOM_ID: redraw
+:END:
 
 To be able to update the line, I need to move the drawing code into a function that I can call again, and I also need to reuse the =<rect>= elements I've previously created. It's useful to use [[https://bost.ocks.org/mike/circles/][d3's enter-exit pattern]] here; it will let me reuse, create, or remove elements as my data changes. To use it, I need a container for the =<rect>= elements; I put it in a variable ~gPoints~. I also need to separate the logic for the /algorithm/ (function ~pointsOnLine~) from the logic for /drawing/ (function ~redraw~).
 
@@ -140,7 +168,7 @@ Great! Now I have an interactive diagram. But this isn't an /explanation/.
 :CUSTOM_ID: steps
 :END:
 
-To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[http://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I want to show the steps of the code:
+To explain how an algorithm works, I sometimes break it down into the steps of the execution and sometimes into the steps of the code. For a tutorial like [[https://www.redblobgames.com/pathfinding/a-star/introduction.html][my introduction to A*]], I showed the execution. For line drawing, I want to show the steps of the code:
 
 - Linear interpolation of numbers
 - Linear interpolation of points
@@ -322,9 +350,9 @@ Here's what the diagrams look like with the nicer styling.
 <iframe src="13/" data-show="snap-to-grid" width="600" height="300"/>
 #+end_export
 
-Click the "13/index.html" link to see the full page and the "source" link to see the source code.
+Click the "13/index.html" link to see the full page and the "source" link to see the source code. The source code for the example tutorial is public domain, so please copy/fork it and use it to make your own tutorials!
 
-The source code for the example tutorial is public domain, so please copy/fork it and use it to make your own tutorials!
+This is my first full tutorial about making tutorials. Feedback? Comment below, or comment on the [[https://trello.com/c/VaeEm3iT/141-making-of-line-drawing-tutorial-v2][trello card]].
 
 #+begin_export html
 <script src="making-of.js"></script>
@@ -332,6 +360,6 @@ The source code for the example tutorial is public domain, so please copy/fork i
 
 #+begin_footer
 Created May 2017
-with [[http://orgmode.org/][Emacs Org-mode]], from [[file:index.org][index.org]]. The diagrams use [[https://d3.org/][d3.js v4]]. All the HTML, CSS, and Javascript on the page is available [[https://github.com/redblobgames/making-of-line-drawing][on github/redblobgames]].
+with [[http://orgmode.org/][Emacs Org-mode]], from [[file:index.org][index.org]]. The diagrams use [[https://d3js.org/][d3.js v4]]. All the HTML, CSS, and Javascript on the page is available [[https://github.com/redblobgames/making-of-line-drawing][on github/redblobgames]].
 Page last modified {{{modification-time(%F)}}}.
 #+end_footer
