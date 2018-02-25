@@ -94,7 +94,7 @@ function showOneElement(iframe) {
     iframe.setAttribute('scrolling', "no");
 
     let id = iframe.getAttribute('data-show');
-    root.selectAll("body > *:not(script)").each(function() {
+    root.selectAll("body > *:not(script):not(.shared-defs)").each(function() {
         let element = d3.select(this);
         element.style('display', id == element.attr('id') ? "" : "none");
     });

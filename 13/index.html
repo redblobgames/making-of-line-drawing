@@ -47,18 +47,6 @@
     </p>
     <div id="demo">
       <svg width="550" height="220">
-        <defs>
-          <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-            <feOffset dy="1" result="offsetblur"/>
-            <feFlood flood-color="#000000"/>
-            <feComposite in2="offsetblur" operator="in"/>
-            <feMerge>
-              <feMergeNode/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
       </svg>
     </div>
     <h2>Linear interpolation: numbers</h2>
@@ -109,6 +97,21 @@ lerp(  5,   3, <span data-name="t"></span>) = <span id="lerp4"></span>
         the optimal value of <b class="optimal-N"></b> = max(Δx,Δy).
       </p>
     </div>
+    <!-- this svg stores the shared defs used by other svgs on the page -->
+    <svg class="shared-defs" width="1" height="1">
+      <defs>
+        <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+          <feOffset dy="1" result="offsetblur"/>
+          <feFlood flood-color="#000000"/>
+          <feComposite in2="offsetblur" operator="in"/>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+    </svg>
     <script src="line-drawing.js"></script>
     <footer xmlns:dct="http://purl.org/dc/terms/" xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#">
       <a rel="license"
