@@ -47,6 +47,18 @@
     </p>
     <div id="demo">
       <svg width="550" height="220">
+        <defs>
+          <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+            <feOffset dy="1" result="offsetblur"/>
+            <feFlood flood-color="#000000"/>
+            <feComposite in2="offsetblur" operator="in"/>
+            <feMerge>
+              <feMergeNode/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
       </svg>
     </div>
     <h2>Linear interpolation: numbers</h2>
@@ -91,18 +103,6 @@ lerp(  5,   3, <span data-name="t"></span>) = <span id="lerp4"></span>
     </p>
     <div id="snap-to-grid">
       <svg width="550" height="220">
-        <defs>
-          <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
-            <feOffset dy="1" result="offsetblur"/>
-            <feFlood flood-color="#000000"/>
-            <feComposite in2="offsetblur" operator="in"/>
-            <feMerge>
-              <feMergeNode/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
       </svg>
       <p>
         Try varying N = <span data-name="N"></span> until it reaches
