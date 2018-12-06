@@ -44,7 +44,8 @@ function injectLayers(iframe, callback) {
                 .attr('height', 220);
         });
 
-    let controls = d3.select(iframe.node().parentNode.insertBefore(document.createElement('div'), iframe.node().nextElementSibling));
+    let controls = d3.select(iframe.node().parentNode.parentNode.insertBefore(document.createElement('div'), iframe.node().nextElementSibling));
+    controls.attr('class', "controls");
     addCssToggleCheckbox(container.select("svg"), controls, 'rotated', "Show layers");
     
     if (callback) { callback(container, controls); };
@@ -70,9 +71,10 @@ injectLayers(d3.select('iframe[src="13/"]'));
 
 /* For each iframe I want to include links to each page and source */
 d3.selectAll("iframe").each(function(_, i) {
+    if (i === 0) { return; }
     let src = this.getAttribute('src');
     let div = document.createElement('div');
-    this.parentNode.insertBefore(div, this);
+    this.parentNode.parentNode.insertBefore(div, this.parentNode);
     let selection = d3.select(div)
         .attr('class', "ref");
     selection.append('a').attr('href', src).text(src+"index.html");

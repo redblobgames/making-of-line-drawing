@@ -9,7 +9,6 @@ This page is hard to make responsive, because of the iframes, so I left it in my
 
 #+begin_export html
 <x:head>
-<x:width override="600"/>
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:site" content="@redblobgames" />
 <meta name="og:url" content="https://www.redblobgames.com/making-of/line-drawing/" />
@@ -20,16 +19,33 @@ This page is hard to make responsive, because of the iframes, so I left it in my
 </x:head>
 
 <style>
-iframe { 
+main iframe { 
     border-radius: 5px 0 5px 5px;
     border: 1px solid hsl(0,10%,80%); 
-    padding: 10px 23px; 
+    padding: 5px 10px; 
     box-shadow: inset 0 0 5px rgba(0,0,0,0.2); 
     background-color: hsl(60,10%,95%);
     overflow: hidden;
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+}
+figure {
+    /* responsive iframe trick from https://jameshfisher.com/2017/08/30/how-do-i-make-a-full-width-iframe.html */
+    position: relative;
+    overflow: hidden;
+    margin-top: 0;
+}
+figure.height-250 {
+    padding-top: 45%;
+}
+figure.height-300 {
+    padding-top: 50%;
 }
 button {
     margin-right: 1em;
+}
+.controls {
+    font-family: var(--sans-serif);
 }
 .ref {
     width: 30%;
@@ -41,12 +57,14 @@ button {
     border-bottom-width: 0px;
     border-radius: 5px 5px 0 0;
 }
-.intro-diagram .ref {
-    display: none;
-}
 input[type="checkbox"], label {
     cursor: pointer;
     font-weight: bold;
+}
+@media (max-width: 1040px) {
+    .intro-diagram {
+        clear: right;
+    }
 }
 </style>
 #+end_export
@@ -54,9 +72,9 @@ input[type="checkbox"], label {
 People ask me how I write my interactive tutorials. I can point at the HTML+CSS+JS but that doesn't show the /process/. On this page I'll recreate the first half of my [[https://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3js.org/][d3.js v4]].
 
 #+begin_export html
-<div class="intro-diagram">
-<iframe src="13/" data-show="demo" width="600" height="300"/>
-</div>
+<div class="intro-diagram"><figure class="height-300">
+<iframe src="13/" data-show="demo"/>
+</figure></div>
 #+end_export
 
 It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step. 
@@ -84,14 +102,16 @@ if (/Trident\//.test(navigator.userAgent)) {
 I usually start with a basic web page template that includes scripts, footers, and one blank SVG diagram:
 
 #+begin_export html
-<iframe src="1/" width="600" height="400"/>
+<div><figure style="height:375px">
+<iframe src="1/"/>
+</figure></div>
 #+end_export
 
 I attach an ~id=~ to an html element so that I can get to it from Javascript, using ~document.getElementById~ or its d3 equivalent. Sometimes I'll attach it to the ~<svg>~ and sometimes to a ~<div>~ outside the svg. For this page, I want interactive elements outside the svg so I'm putting the id on the ~<div>~.
 
 #+include: "1/index.html" src html
 
-I'll omit the header and footer from the rest of the examples. Click the filename on the upper right to see the entire page up to that point.
+I'll omit the header and footer from the rest of the examples. Click the filename on the upper right to see the entire page up to that point. Using a ~viewBox~ on ~<svg>~ tells it the coordinate system to for drawing. We can use that to keep a consistent coordinate system even if the diagram is resized.
 
 * Diagram
 :PROPERTIES:
@@ -103,7 +123,9 @@ Sometimes I'll add a diagram first and then add some text; other times I'll star
 The tutorial is about drawing lines on a square grid, so I need to draw a grid and also draw lines. I'll draw a grid with Javascript:
 
 #+begin_export html
-<iframe src="2/" data-show="demo" width="600" height="250"/>
+<div><figure class="height-250">
+<iframe src="2/" data-show="demo"/>
+</figure></div>
 #+end_export
 
 Although d3 has a pattern for creating multiple elements with =selectAll()= + =data()= + =enter()=, I don't need that here so I'm just creating the elements directly:
@@ -122,7 +144,9 @@ Those of you who know SVG might choose to use =viewBox= or =transform= to change
 The main algorithm I'm trying to demonstrate on the page is drawing a line on a grid. I need to implement that algorithm and a visualization for it.
 
 #+begin_export html
-<iframe src="3/" data-show="demo" width="600" height="250"/>
+<div><figure class="height-250">
+<iframe src="3/" data-show="demo"/>
+</figure></div>
 #+end_export
 
 #+include: "3/line-drawing.js" src js :lines "18-"
@@ -139,7 +163,9 @@ This is just the beginning. It's a working implementation of the algorithm and a
 What I most often do for interaction is let the reader change the /inputs/ to the algorithm and then I show the /outputs/. For line drawing, the inputs are the two endpoints, =A= and =B= in the code.
 
 #+begin_export html
-<iframe src="4/" data-show="demo" width="600" height="250"/>
+<div><figure class="height-250">
+<iframe src="4/" data-show="demo"/>
+</figure></div>
 #+end_export
 
 #+include: "4/line-drawing.js" src js :lines "31-"
@@ -156,7 +182,9 @@ This code lets me update the inputs =A= and =B= but it doesn't recalculate the o
 To be able to update the line, I need to move the drawing code into a function that I can call again, and I also need to reuse the =<rect>= elements I've previously created. It's useful to use [[https://bost.ocks.org/mike/circles/][d3's enter-exit pattern]] here; it will let me reuse, create, or remove elements as my data changes. To use it, I need a container for the =<rect>= elements; I put it in a variable ~gPoints~. I also need to separate the logic for the /algorithm/ (function ~pointsOnLine~) from the logic for /drawing/ (function ~redraw~).
 
 #+begin_export html
-<iframe src="5/" data-show="demo" width="600" height="250"/>
+<div><figure class="height-250">
+<iframe src="5/" data-show="demo"/>
+</figure></div>
 #+end_export
 
 #+include: "5/line-drawing.js" src js :lines "18-"
@@ -178,7 +206,9 @@ To explain how an algorithm works, I sometimes break it down into the steps of t
 Since I'm going to have multiple diagrams, it'll be useful to encapsulate all those global variables and functions into a /diagram object/.
 
 #+begin_export html
-<iframe src="6/" data-show="demo" width="600" height="250"/>
+<div><figure class="height-250">
+<iframe src="6/" data-show="demo"/>
+</figure></div>
 #+end_export
 
 #+include: "6/line-drawing.js" src js :lines "21-"
@@ -207,7 +237,9 @@ How do I want this to work?
 There are other things that you may want for scrubbable numbers but these are all I need for this tutorial. Within a named ~<div>~ section I'll find all the ~<span data-name="XYZ">~ and turn them into scrubable numbers stored in field XYZ of the diagram object.
 
 #+begin_export html
-<iframe src="7/" data-show="linear-interpolation" width="600" height="120"/>
+<div><figure style="height: 8em">
+<iframe src="7/" data-show="linear-interpolation"/>
+</figure></div>
 #+end_export
 
 Scrubbable numbers are cool but a little bit tricky. I'm using d3-drag to tell me how far left/right the mouse was dragged. Then I scale the relative mouse position from -100 pixels to +100 pixels to the desired low–high range, using a linear scaling (see =positionToValue=):
@@ -232,7 +264,9 @@ Using linear interpolation of numbers, I want to display the linear interpolatio
 #+include: "8/line-drawing.js" src js :lines "20-28"
 
 #+begin_export html
-<iframe src="8/" data-show="interpolate-t" width="600" height="300"/>
+<div><figure class="height-300">
+<iframe src="8/" data-show="interpolate-t"/>
+</figure></div>
 #+end_export
 
 I'm starting to organize things in terms of layers, which have the /creation/ code and the /update/ code:
@@ -252,7 +286,9 @@ There are now two diagrams on the page. Both display the grid. The first diagram
 When I'm writing a tutorial that requires multiple diagrams, each with different features, I like to divide the diagrams into /layers/, and then stack them on top of each other. There are four layers in the previous diagram: /grid/, /track/, /interpolation point/, and /drag handle/. Click “Show layers” to see them:
 
 #+begin_export html
-<iframe src="9/" data-show="interpolate-t" width="600" height="300"/>
+<div><figure class="height-300">
+<iframe src="9/" data-show="interpolate-t" />
+</figure></div>
 #+end_export
 
 I'll create each layer by a method that adds a =<g>= for a layer, then adds its /update/ function to the diagram object. Here's the code for managing the update functions:
@@ -279,7 +315,9 @@ The third diagram has yet a different visualization layer, but it will be easier
 #+include: "10/line-drawing.js" src js :lines "28-36"
 
 #+begin_export html
-<iframe src="10/" data-show="interpolate-N" width="600" height="300"/>
+<div><figure class="height-300">
+<iframe src="10/" data-show="interpolate-N" />
+</figure></div>
 #+end_export
 
 The drawing code turns out to be very similar to the previous case so I made it read either /t/ or /N/:
@@ -306,7 +344,9 @@ We already know how to round numbers to the nearest integer. To snap points to t
 I drew this on another layer.
 
 #+begin_export html
-<iframe src="11/" data-show="snap-to-grid" width="600" height="300"/>
+<div><figure class="height-300">
+<iframe src="11/" data-show="snap-to-grid" />
+</figure></div>
 #+end_export
 
 I also want to tell people when they've reached the optimal N, which is max(Δx,Δy).
@@ -334,7 +374,9 @@ Although I have the essentials working, I usually spend some time making the dia
 - Interaction feedback: I change the CSS =cursor= when the mouse is over an interactable element (drag handles and the scrubbable numbers). I also draw drop shadows. The combination makes the interactive elements respond immediately, telling the reader that they're the right things to click on.
 
 #+begin_export html
-<iframe src="12/" data-show="snap-to-grid" width="600" height="300"/>
+<div><figure class="height-300">
+<iframe src="12/" data-show="snap-to-grid" />
+</figure></div>
 #+end_export
 
 There are lots more ways to make the page better but these will give a lot of benefit for little effort.
@@ -347,7 +389,9 @@ There are lots more ways to make the page better but these will give a lot of be
 Here's what the diagrams look like with the nicer styling.
 
 #+begin_export html
-<iframe src="13/" data-show="snap-to-grid" width="600" height="300"/>
+<div><figure class="height-300">
+<iframe src="13/" data-show="snap-to-grid" />
+</figure></div>
 #+end_export
 
 Click the "13/index.html" link to see the full page and the "source" link to see the source code. The source code for the example tutorial is public domain, so please copy/fork it and use it to make your own tutorials!

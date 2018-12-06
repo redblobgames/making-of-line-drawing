@@ -11,6 +11,12 @@ html {
     color: hsl(60,0%,0%);
     font-family: sans-serif;
     font-size: 14px;
+    font-size: calc(8px + 1vw);
+}
+@media (min-width: 660px) {
+    html {
+        font-size: 20px;
+    }
 }
 body > div, body > p, h1, h2 {
     max-width: 550px;
