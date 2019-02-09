@@ -3,18 +3,17 @@
 
 #+begin_comment
 <x:head> is used in my html preprocessor to put stuff into the <head> section of the page; org-mode doesn't have a way to do that normally
-
-This page is hard to make responsive, because of the iframes, so I left it in my 600px format.
 #+end_comment
 
 #+begin_export html
 <x:head>
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:site" content="@redblobgames" />
-<meta name="og:url" content="https://www.redblobgames.com/making-of/line-drawing/" />
-<meta name="og:title" content="Making of: Line drawing tutorial" />
-<meta name="og:description" content="Interactive tutorial about making interactive tutorials" />
-<meta name="og:image" content="https://www.redblobgames.com/making-of/line-drawing/blog/image3.png" />
+<meta property="og:url" content="https://www.redblobgames.com/making-of/line-drawing/" />
+<meta property="og:title" content="Making of: Line drawing tutorial" />
+<meta property="og:description" content="Interactive tutorial about making interactive tutorials" />
+<meta property="og:image" content="https://www.redblobgames.com/making-of/line-drawing/blog/image3.png" />
+
 <script src="https://d3js.org/d3.v4.min.js"></script>
 </x:head>
 
