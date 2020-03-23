@@ -11,15 +11,15 @@ html {
     color: hsl(60,0%,0%);
     font-family: sans-serif;
     font-size: 14px;
-    font-size: calc(8px + 1vw);
+    font-size: calc(0.5rem + 1vw);
 }
-@media (min-width: 660px) {
+@media (min-width: 41rem) {
     html {
-        font-size: 20px;
+        font-size: 1.25rem;
     }
 }
 body > div, body > p, h1, h2 {
-    max-width: 550px;
+    max-width: 35rem;
     margin-right: auto;
     margin-left: auto;
     margin-top: 0.5em;
