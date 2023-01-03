@@ -319,7 +319,7 @@ The third diagram has yet a different visualization layer, but it will be easier
 </figure></div>
 #+end_export
 
-The drawing code turns out to be very similar to the previous case so I made it read either /t/ or /N/:
+The drawing code turns out to be similar to the previous case so I made it read either /t/ or /N/:
 
 #+include: "10/line-drawing.js" src js :lines "125-146"
 
@@ -403,6 +403,6 @@ This is my first full tutorial about making tutorials. Feedback? Comment below, 
 
 #+begin_footer
 Created May 2017
-with [[http://orgmode.org/][Emacs Org-mode]], from [[file:index.org][index.org]]. The diagrams use [[https://d3js.org/][d3.js v4]]. All the HTML, CSS, and Javascript on the page is available [[https://github.com/redblobgames/making-of-line-drawing][on github/redblobgames]].
+with [[https://orgmode.org/][Emacs Org-mode]], from [[file:index.org][index.org]]. The diagrams use [[https://d3js.org/][d3.js v4]]. All the HTML, CSS, and Javascript on the page is available [[https://github.com/redblobgames/making-of-line-drawing][on github/redblobgames]].
 Page last modified {{{modification-time(%F)}}}.
 #+end_footer
