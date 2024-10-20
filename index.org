@@ -68,7 +68,11 @@ input[type="checkbox"], label {
 </style>
 #+end_export
 
-People ask me how I write my interactive tutorials. I can point at the HTML+CSS+JS but that doesn't show the /process/. On this page I'll recreate the first half of my [[https://www.redblobgames.com/grids/line-drawing.html][line drawing tutorial]], using [[https://d3js.org/][d3.js v4]].
+People ask me how I write my interactive tutorials. I can point at the HTML+CSS+JS but that doesn't show the /process/. On this page I'll recreate the first half of my [[https://www.redblobgames.com/grids/line-drawing/][line drawing tutorial]], showing the an implementation using [[https://d3js.org/][D3.js v4]]. The implementation style will be similar if you use jQuery. I also have [[https://www.redblobgames.com/making-of/circle-drawing/][another page showing an implementation using the Vue/React/Svelte declarative style]].
+
+In this tutorial I'm implementing diagrams using SVG instead of Canvas or WebGL. I usually choose SVG in part because DOM-manipulating libraries like D3 and Vue make HTML and SVG easier to work with.
+
+The goal is to implement interactive diagrams like this:
 
 #+begin_export html
 <div class="intro-diagram"><figure class="height-300">
@@ -76,22 +80,11 @@ People ask me how I write my interactive tutorials. I can point at the HTML+CSS+
 </figure></div>
 #+end_export
 
-It's a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step. 
+The line drawing tutorial was a medium sized project for me, with multiple diagrams, multiple layers in each diagram, draggable handles, and scrubbable numbers. I'll include pointers to the code in each step. 
 
 This is an /interactive tutorial about making interactive tutorials/.
 
-You should know some Javascript to follow the tutorial. It will help if you know some SVG and HTML. I use D3 here but the techniques would work with other libraries too. If you're interested in making your own, I recommend trying to recreate the diagrams yourself while following the tutorial.
-
-#+begin_export html
-<div id="ie-warning"/>
-<script>
-if (/Trident\//.test(navigator.userAgent)) {
-    d3.select("#ie-warning").text("NOTE: this page may not work in Internet Explorer.");
-} else if (/Edge\/15/.test(navigator.userAgent)) {
-    d3.select("#ie-warning").text("NOTE: the 'show styles' feature on this page may not work in Internet Explorer Edge.");
-}
-</script>
-#+end_export
+You should know some Javascript to follow the tutorial. It will help if you know some SVG and HTML. If you're interested in making your own interactive pages, I recommend trying to recreate the diagrams yourself while following the tutorial.
 
 * Web page
 :PROPERTIES:
